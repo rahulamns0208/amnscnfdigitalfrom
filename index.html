@@ -567,8 +567,8 @@
     }
   }
 
-  // HTTP WEBHOOK ENDPOINT (Add your Power Automate URL inside quotes when ready)
-  const webhookUrl = 'https://default37cd273a1cec4aaea29741480ea54f.8d.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/62e0ced429bc4b2aa03c672bf333334b/triggers/manual/paths/invoke?api-version=1';
+  // HTTP WEBHOOK ENDPOINT (Paste full copied URL from Power Automate inside quotes below)
+  const webhookUrl = 'YOUR_FULL_POWER_AUTOMATE_URL_HERE';
 
   function isNumericOnly(val) {
     return /^[0-9]+$/.test(String(val).trim());
@@ -648,8 +648,7 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    if (!webhookUrl) {
-      // Local client UI transition when no webhook URL is set
+    if (!webhookUrl || webhookUrl === 'YOUR_FULL_POWER_AUTOMATE_URL_HERE') {
       completeSubmissionUI();
       return;
     }
@@ -657,7 +656,7 @@
     try {
       const response = await fetch(webhookUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'text/plain' },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
 
@@ -715,7 +714,7 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    if (!webhookUrl) {
+    if (!webhookUrl || webhookUrl === 'YOUR_FULL_POWER_AUTOMATE_URL_HERE') {
       finishExitUI();
       return;
     }
@@ -723,12 +722,16 @@
     try {
       const response = await fetch(webhookUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'text/plain' },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
 
       if (response.ok || response.status === 202 || response.status === 200) {
         finishExitUI();
+      } else {
+        alert("⚠️ Server Error (" + response.status + "). Please check backend integration.");
+        btn.disabled = false;
+        btnText.innerHTML = '✅ STEP 2: COMPLETE WORK & CLOSE PERMIT';
       }
     } catch(err) {
       alert("❌ Connection Error during exit sign-out.");
