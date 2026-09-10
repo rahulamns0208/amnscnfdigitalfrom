@@ -1,733 +1,273 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Confined Space & GHA FPS Registration Portal</title>
-  <style>
-    :root {
-      --amns-red: #e31837;
-      --amns-dark: #0f172a;
-      --border-color: #cbd5e1;
-      --pass-green: #10b981;
-      --light-bg: #f8fafc;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AM/NS India - Confined Space & GHA FPS Registration Portal</title>
+    <style>
+        :root {
+            --primary-color: #c8102e;
+            --secondary-color: #222222;
+            --bg-color: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --border-color: #cccccc;
+        }
 
-    * { box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
 
-    body {
-      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
-      min-height: 100vh;
-      padding: 16px;
-      margin: 0;
-    }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
 
-    .document-card {
-      max-width: 850px;
-      margin: 0 auto;
-      background: #ffffff;
-      border-radius: 8px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-      overflow: hidden;
-      border-top: 6px solid var(--amns-red);
-      animation: fadeInCard 0.6s ease-out forwards;
-    }
+        .header {
+            text-align: center;
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
 
-    @keyframes fadeInCard {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+        .header h1 {
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 24px;
+            text-transform: uppercase;
+        }
 
-    .brand-header {
-      background: #ffffff;
-      color: var(--amns-dark);
-      padding: 18px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 3px solid var(--amns-red);
-    }
+        .header h2 {
+            color: var(--secondary-color);
+            margin: 5px 0 0 0;
+            font-size: 16px;
+            font-weight: 500;
+        }
 
-    .brand-logo-svg { height: 42px; width: auto; }
+        .form-group {
+            margin-bottom: 20px;
+        }
 
-    .brand-address {
-      text-align: right;
-      font-size: 11px;
-      color: #475569;
-      line-height: 1.4;
-      font-weight: 600;
-    }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--secondary-color);
+        }
 
-    .doc-title-strip {
-      background: linear-gradient(90deg, #d97706 0%, #ea580c 100%);
-      color: #ffffff;
-      padding: 10px 20px;
-      font-weight: 800;
-      font-size: 13px;
-      text-transform: uppercase;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+        input[type="text"],
+        input[type="number"],
+        input[type="datetime-local"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
 
-    .status-badge {
-      background: #64748b;
-      color: #ffffff;
-      padding: 4px 12px;
-      border-radius: 12px;
-      font-size: 11px;
-      font-weight: 800;
-      transition: all 0.3s ease;
-    }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
 
-    .status-badge.active {
-      background: #d97706;
-      animation: pulseBadge 1.8s infinite;
-    }
+        .row {
+            display: flex;
+            gap: 15px;
+        }
 
-    @keyframes pulseBadge {
-      0% { box-shadow: 0 0 0 0 rgba(217, 119, 6, 0.7); }
-      70% { box-shadow: 0 0 0 8px rgba(217, 119, 6, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(217, 119, 6, 0); }
-    }
+        .row .form-group {
+            flex: 1;
+        }
 
-    .status-badge.closed { background: var(--pass-green); }
+        .btn-submit {
+            background-color: var(--primary-color);
+            color: #ffffff;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.3s ease;
+        }
 
-    .form-body { padding: 20px; }
+        .btn-submit:hover {
+            background-color: #a00c23;
+        }
 
-    .section-header {
-      background: #f1f5f9;
-      color: var(--amns-dark);
-      padding: 8px 12px;
-      font-weight: 800;
-      font-size: 12px;
-      text-transform: uppercase;
-      border-left: 4px solid var(--amns-red);
-      margin-top: 18px;
-      margin-bottom: 12px;
-    }
+        .status-message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+            text-align: center;
+            font-weight: bold;
+        }
 
-    .structured-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 12px; }
-    .structured-table th, .structured-table td { border: 1px solid var(--border-color); padding: 8px; text-align: left; }
-    .structured-table th { background-color: #f1f5f9; color: var(--amns-dark); font-weight: 700; }
+        .status-message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
 
-    .form-input, .form-select {
-      width: 100%;
-      padding: 8px;
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
-      font-size: 12px;
-      background: var(--light-bg);
-      outline: none;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .form-input:focus, .form-select:focus {
-      border-color: var(--amns-red);
-      background: #ffffff;
-      box-shadow: 0 0 0 3px rgba(227, 24, 55, 0.15);
-    }
-
-    .check-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--amns-dark);
-    }
-
-    .check-item input[type="checkbox"], .check-item input[type="radio"] {
-      width: 16px;
-      height: 16px;
-      accent-color: var(--amns-red);
-      cursor: pointer;
-    }
-
-    .entrant-row {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 8px;
-    }
-
-    .btn-add-entrant {
-      background: #3b82f6;
-      color: #ffffff;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 4px;
-      font-size: 11px;
-      font-weight: 700;
-      cursor: pointer;
-      margin-top: 4px;
-    }
-
-    .action-panel {
-      padding: 16px;
-      border-radius: 8px;
-      margin-top: 20px;
-      text-align: center;
-    }
-
-    .panel-phase1 { background: #fff7ed; border: 2px solid #fdba74; }
-    .panel-phase2 { background: #f0fdf4; border: 2px solid #86efac; }
-
-    .btn-action {
-      width: 100%;
-      padding: 14px;
-      border: none;
-      border-radius: 6px;
-      font-weight: 800;
-      color: #ffffff;
-      cursor: pointer;
-      font-size: 14px;
-      text-transform: uppercase;
-      margin-top: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .btn-start { background: linear-gradient(90deg, #d97706 0%, #ea580c 100%); }
-    .btn-complete { background: linear-gradient(90deg, #16a34a 0%, #15803d 100%); }
-
-    .success-screen {
-      background: #f0fdf4;
-      border: 3px solid #16a34a;
-      border-radius: 12px;
-      padding: 30px;
-      text-align: center;
-      margin: 20px 0;
-    }
-
-    .success-title {
-      color: #15803d;
-      font-size: 22px;
-      font-weight: 900;
-      margin: 10px 0;
-      text-transform: uppercase;
-    }
-
-    .photo-container {
-      margin: 10px 0;
-      padding: 10px;
-      background: #ffffff;
-      border: 1px dashed #cbd5e1;
-      border-radius: 6px;
-    }
-
-    .photo-preview {
-      max-width: 100%;
-      max-height: 180px;
-      margin-top: 8px;
-      display: none;
-      border-radius: 6px;
-    }
-  </style>
+        .status-message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
 </head>
 <body>
 
-<div class="document-card">
-  <!-- AM/NS Corporate Header -->
-  <div class="brand-header">
-    <div class="brand-logo">
-      <svg class="brand-logo-svg" viewBox="0 0 160 50" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <text x="0" y="32" fill="#0f172a" font-family="'Segoe UI', Arial, sans-serif" font-weight="900" font-size="32" letter-spacing="0.5">AM/NS</text>
-        <text x="0" y="46" fill="#e31837" font-family="'Segoe UI', Arial, sans-serif" font-weight="900" font-size="14" letter-spacing="1">INDIA</text>
-      </svg>
+<div class="container">
+    <div class="header">
+        <h1>AM/NS INDIA</h1>
+        <h2>Confined Space & Gas Hazard Area (GHA) Entry Registration</h2>
     </div>
-    <div class="brand-address">
-      ArcelorMittal Nippon Steel India Private Limited<br>
-      Confined Space & GHA FPS Registration Portal
-    </div>
-  </div>
 
-  <div class="doc-title-strip">
-    <div>Digital Entry Permit & Safety Clearance Register</div>
-    <div class="status-badge" id="permStatus">1. PRE-ENTRY SETUP</div>
-  </div>
-
-  <!-- Form Fields Section -->
-  <div id="formSection">
-    <form class="form-body" id="permitForm" onsubmit="event.preventDefault();">
-
-      <!-- 1. Mandatory Permit References & Department Identification -->
-      <div class="section-header">1. Permit References & Department Identification</div>
-      <table class="structured-table">
-        <tr>
-          <th style="width: 30%;">Master Permit to Work (PTW) No. (Numbers Only) *</th>
-          <td><input type="text" id="ptwNo" class="form-input auto-save" placeholder="e.g. 20260905001" pattern="[0-9]+" title="Numbers Only Allowed" required></td>
-        </tr>
-        <tr>
-          <th>Confined Space Permit No. (Numbers Only) *</th>
-          <td><input type="text" id="spaceId" class="form-input auto-save" placeholder="e.g. 2026002" pattern="[0-9]+" title="Numbers Only Allowed" required></td>
-        </tr>
-        <tr>
-          <th>Work at Height / Depth Permit No. (Numbers Only) *</th>
-          <td><input type="text" id="heightPermitNo" class="form-input auto-save" placeholder="e.g. 20268812" pattern="[0-9]+" title="Numbers Only Allowed" required></td>
-        </tr>
-        <tr>
-          <th>LOTO Clearance Permit No. (Numbers Only) *</th>
-          <td><input type="text" id="lotoNo" class="form-input auto-save" placeholder="e.g. 20264412" pattern="[0-9]+" title="Numbers Only Allowed" required></td>
-        </tr>
-        <tr>
-          <th>Electrical Safety Certificate No. (Numbers Only) *</th>
-          <td><input type="text" id="electricalCertNo" class="form-input auto-save" placeholder="e.g. 2026102" pattern="[0-9]+" title="Numbers Only Allowed" required></td>
-        </tr>
-        <tr>
-          <th>Executing Department (Text & Numbers) *</th>
-          <td>
-            <select id="deptSelect" class="form-select auto-save" required>
-              <option value="" disabled selected>-- Select Responsible Department --</option>
-              <option value="CGL - Mechanical">CGL - Mechanical</option>
-              <option value="CGL - Production">CGL - Production</option>
-              <option value="CGL - Electrical">CGL - Electrical</option>
-              <option value="CCL - Mechanical">CCL - Mechanical</option>
-              <option value="CCL - Production">CCL - Production</option>
-              <option value="CCL - Electrical">CCL - Electrical</option>
-              <option value="CRM - Mechanical">CRM - Mechanical</option>
-              <option value="CRM - Production">CRM - Production</option>
-              <option value="CRM - Electrical">CRM - Electrical</option>
-              <option value="ARP & Pickling - Mechanical">ARP & Pickling - Mechanical</option>
-              <option value="ARP & Pickling - Production">ARP & Pickling - Production</option>
-              <option value="ARP & Pickling - Electrical">ARP & Pickling - Electrical</option>
-              <option value="Utility - Mechanical">Utility - Mechanical</option>
-              <option value="Utility - Production">Utility - Production</option>
-              <option value="Utility - Electrical">Utility - Electrical</option>
-              <option value="Admin">Admin</option>
-              <option value="Logistics">Logistics</option>
-              <option value="Civil">Civil</option>
-            </select>
-          </td>
-        </tr>
-        <tr>
-          <th>Area Hazard Classification *</th>
-          <td>
-            <div class="check-item" style="display: flex; gap: 20px;">
-              <label class="check-item"><input type="radio" name="areaClassification" class="auto-save-radio" value="GHA (Gas Hazard Area)" checked> 🔴 GHA (Gas Hazard Area)</label>
-              <label class="check-item"><input type="radio" name="areaClassification" class="auto-save-radio" value="NGHA (Non Gas Hazard Area)"> 🟢 NGHA (Non Gas Hazard Area)</label>
+    <form id="digitalEntryForm">
+        <div class="row">
+            <div class="form-group">
+                <label for="permitNo">Master Permit No. *</label>
+                <input type="text" id="permitNo" name="permitNo" required placeholder="e.g., PER-2026-001">
             </div>
-          </td>
-        </tr>
-        <tr>
-          <th>Equipment / Vessel (Text & Numbers) *</th>
-          <td><input type="text" id="equipment" class="form-input auto-save" placeholder="e.g. Acid Scrubbing Tank No 2" required></td>
-        </tr>
-        <tr>
-          <th>Work Description (Text & Numbers) *</th>
-          <td><input type="text" id="workDesc" class="form-input auto-save" placeholder="e.g. Nozzle replacement 2 inch" required></td>
-        </tr>
-      </table>
-
-      <!-- 2. Pre-Entry Verification Photos & TBT Register (OPTIONAL) -->
-      <div class="section-header">2. Pre-Entry Verification Photos & Toolbox Talk (TBT) (Optional)</div>
-      <table class="structured-table">
-        <tr>
-          <th style="width: 35%;">Pre-Entry Entrant Photo (Optional)</th>
-          <td>
-            <div class="photo-container">
-              <input type="file" id="preEntrantPhoto" accept="image/*" capture="environment" onchange="previewImg(event, 'previewPreEntrant')">
-              <br><img id="previewPreEntrant" class="photo-preview" alt="Pre-Entry Entrant Photo">
+            <div class="form-group">
+                <label for="department">Department *</label>
+                <select id="department" name="department" required>
+                    <option value="">Select Department</option>
+                    <option value="CRM-Production">CRM - Production</option>
+                    <option value="CRM-Mechanical">CRM - Mechanical</option>
+                    <option value="CRM-Electrical">CRM - Electrical</option>
+                    <option value="ARP">ARP</option>
+                    <option value="Pickling">Pickling</option>
+                    <option value="CGL">CGL</option>
+                </select>
             </div>
-          </td>
-        </tr>
-        <tr>
-          <th>Pre-Safety TBT Attendance Photo (Optional)</th>
-          <td>
-            <div class="photo-container">
-              <input type="file" id="tbtPhoto" accept="image/*" capture="environment" onchange="previewImg(event, 'previewTbt')">
-              <br><img id="previewTbt" class="photo-preview" alt="Toolbox Talk Attendance Photo">
+        </div>
+
+        <div class="row">
+            <div class="form-group">
+                <label for="location">Exact Work Location / Equipment *</label>
+                <input type="text" id="location" name="location" required placeholder="e.g., Tank / Cell / Basement Area">
             </div>
-          </td>
-        </tr>
-      </table>
-
-      <!-- 3. Authorized Entrants & Designated Personnel Register -->
-      <div class="section-header">3. Authorized Entrants & Designated Personnel Register</div>
-      <table class="structured-table">
-        <tr>
-          <th style="width: 30%;">Total Entry Headcount *</th>
-          <td><input type="number" id="entryHeadcount" class="form-input" value="1" readonly style="font-weight: 800; color: var(--amns-red);"></td>
-        </tr>
-        <tr>
-          <th>Authorized Entrant Name(s) & ID (Text & Numbers) *</th>
-          <td>
-            <div id="entrantsContainer">
-              <div class="entrant-row">
-                <input type="text" class="form-input entrant-input auto-save" id="entrant1" placeholder="Entrant 1 Full Name & Employee ID" required>
-              </div>
+            <div class="form-group">
+                <label for="status">Work Stage *</label>
+                <select id="status" name="status" required>
+                    <option value="ENTRY_REGISTRATION">Step 1: Entry Registration</option>
+                    <option value="WORK_COMPLETION">Step 2: Exit & Work Completion Sign-off</option>
+                </select>
             </div>
-            <button type="button" class="btn-add-entrant" onclick="addEntrantRow()">➕ Add Another Entrant</button>
-          </td>
-        </tr>
-        <tr>
-          <th>Standby Attendant Name (Text & Numbers) *</th>
-          <td><input type="text" id="attendantName" class="form-input auto-save" placeholder="Full Name & Emp ID" required></td>
-        </tr>
-        <tr>
-          <th>Entry Supervisor Name (Text & Numbers) *</th>
-          <td><input type="text" id="supervisorName" class="form-input auto-save" placeholder="Full Name & Emp ID" required></td>
-        </tr>
-        <tr>
-          <th>Rescue Person Name (Text & Numbers) *</th>
-          <td><input type="text" id="rescuerName" class="form-input auto-save" placeholder="Full Name & Emp ID" required></td>
-        </tr>
-      </table>
+        </div>
 
-      <!-- STEP 1 ACTION: START WORK & ENTER -->
-      <div class="action-panel panel-phase1" id="phase1Panel">
-        <h3 style="margin: 0; color: #c2410c; font-size: 14px;">STEP 1: PERMIT REGISTRATION & PHYSICAL ENTRY</h3>
-        <p style="font-size: 11px; color: #7c2d12; margin: 4px 0 10px;">Verify all permit numbers and details above before entry.</p>
-        <button type="button" class="btn-action btn-start" id="btnStart" onclick="handlePhase1Entry()">
-          <span id="btnStartText">🚪 STEP 1: START WORK & ENTER CONFINED SPACE</span>
-        </button>
-      </div>
+        <div class="row">
+            <div class="form-group">
+                <label for="supervisor">Permit Issuer / Supervisor Name *</label>
+                <input type="text" id="supervisor" name="supervisor" required placeholder="Supervisor Name">
+            </div>
+            <div class="form-group">
+                <label for="attendant">Standby Attendant Name *</label>
+                <input type="text" id="attendant" name="attendant" required placeholder="Attendant Name">
+            </div>
+        </div>
 
+        <div class="row">
+            <div class="form-group">
+                <label for="totalEntrants">Number of Authorized Entrants *</label>
+                <input type="number" id="totalEntrants" name="totalEntrants" min="1" required placeholder="e.g., 3">
+            </div>
+            <div class="form-group">
+                <label for="entryTime">Timestamp *</label>
+                <input type="datetime-local" id="entryTime" name="entryTime" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="entrantsList">Names / Employee IDs of Personnel Entering</label>
+            <textarea id="entrantsList" name="entrantsList" rows="3" placeholder="Enter personnel details separated by commas..."></textarea>
+        </div>
+
+        <button type="submit" class="btn-submit" id="submitBtn">Submit Registration & Trigger Notification</button>
     </form>
-  </div>
 
-  <!-- SUCCESS SCREEN (AUTHORIZATION) -->
-  <div class="form-body" id="successScreen" style="display: none;">
-    <div class="success-screen">
-      <div style="font-size: 50px;">🛡️</div>
-      <div class="success-title">✅ ENTRY AUTHORIZED!</div>
-      <div style="font-size: 16px; font-weight: 800; color: #15803d; margin-bottom: 8px;">
-        TOTAL AUTHORIZED HEADCOUNT: <span id="displayHeadcount">1</span> WORKER(S)
-      </div>
-      <div style="font-size: 15px; font-weight: 700; color: #166534; margin-bottom: 20px;">NOW YOU CAN ENTER SAFELY. ALL THE BEST!</div>
-      
-      <button type="button" class="btn-action btn-complete" onclick="showPhase2ExitPanel()">
-        📸 WORK COMPLETED? CLICK HERE FOR FINAL SIGN-OUT & EXIT VERIFICATION
-      </button>
-    </div>
-  </div>
-
-  <!-- PHASE 2: EXIT HEADCOUNT & EXIT PHOTO VERIFICATION -->
-  <div class="form-body" id="phase2Container" style="display: none;">
-    <div class="action-panel panel-phase2">
-      <h3 style="margin: 0; color: #15803d; font-size: 14px;">STEP 2: WORK COMPLETION & EXIT SIGN-OUT</h3>
-      <p style="font-size: 11px; color: #166534; margin: 4px 0 10px;">Verify total exit headcount and confirm attendance.</p>
-
-      <table class="structured-table" style="text-align: left; margin-top: 14px;">
-        <tr>
-          <th style="width: 40%;">Total Exiting Headcount (Numbers Only) *</th>
-          <td><input type="number" id="exitHeadcount" class="form-input" placeholder="e.g. 1" min="1" required></td>
-        </tr>
-        <tr>
-          <th>Exit Attendance Verification *</th>
-          <td>
-            <label class="check-item">
-              <input type="checkbox" id="chkExitAttendance" required checked> 
-              All entrants physically accounted for outside the space *
-            </label>
-          </td>
-        </tr>
-      </table>
-      
-      <div class="photo-container">
-        <label style="font-size: 11px; font-weight: 700; color: #15803d; display: block; margin-bottom: 6px;">📸 CAPTURE / UPLOAD ENTRANTS EXIT PHOTO (Optional):</label>
-        <input type="file" id="exitPhoto" accept="image/*" capture="environment" onchange="previewImg(event, 'previewExit')">
-        <br>
-        <img id="previewExit" class="photo-preview" alt="Entrant Exit Photo Preview">
-      </div>
-
-      <button type="button" class="btn-action btn-complete" id="btnComplete" onclick="handlePhase2Exit()">
-        <span id="btnCompleteText">✅ STEP 2: COMPLETE WORK & CLOSE PERMIT</span>
-      </button>
-    </div>
-  </div>
-
+    <div id="statusMessage" class="status-message"></div>
 </div>
 
 <script>
-  const COMPANY_PASSWORD = "AMNSICNF0208";
-
-  function checkAuth() {
-    let authenticated = false;
-    while (!authenticated) {
-      const userPass = prompt("🔐 AUTHORIZATION REQUIRED:\nEnter Company Security Password to access portal:");
-      if (userPass === COMPANY_PASSWORD) {
-        authenticated = true;
-      } else if (userPass === null) {
-        alert("Access Denied.");
-        document.body.innerHTML = "<h2 style='color:white; text-align:center; margin-top:50px;'>🔒 Access Denied</h2>";
-        return false;
-      } else {
-        alert("❌ Invalid Password. Please try again.");
-      }
-    }
-    return true;
-  }
-
-  function restoreDraftData() {
-    try {
-      document.querySelectorAll('.auto-save').forEach(input => {
-        const savedVal = sessionStorage.getItem('draft_' + input.id);
-        if (savedVal !== null) input.value = savedVal;
-      });
-
-      document.querySelectorAll('.auto-save-chk').forEach(chk => {
-        const savedChk = sessionStorage.getItem('draft_' + chk.id);
-        if (savedChk !== null) chk.checked = (savedChk === 'true');
-      });
-
-      const savedRadio = sessionStorage.getItem('draft_areaClassification');
-      if (savedRadio) {
-        const radio = document.querySelector(`input[name="areaClassification"][value="${savedRadio}"]`);
-        if (radio) radio.checked = true;
-      }
-    } catch(e) { console.log("Draft restore skipped."); }
-  }
-
-  function clearDraftData() {
-    try { sessionStorage.clear(); } catch(e) {}
-  }
-
-  window.onload = function() {
-    if (checkAuth()) {
-      restoreDraftData();
-    }
-  };
-
-  document.addEventListener('input', (e) => {
-    if (e.target && e.target.classList.contains('auto-save')) {
-      sessionStorage.setItem('draft_' + e.target.id, e.target.value);
-    }
-  });
-
-  document.addEventListener('change', (e) => {
-    if (e.target && e.target.classList.contains('auto-save-chk')) {
-      sessionStorage.setItem('draft_' + e.target.id, e.target.checked);
-    }
-    if (e.target && e.target.classList.contains('auto-save-radio')) {
-      sessionStorage.setItem('draft_areaClassification', e.target.value);
-    }
-  });
-
-  let preEntrantPhotoBase64 = "";
-  let tbtPhotoBase64 = "";
-  let exitPhotoBase64 = "";
-
-  function compressImage(file, callback) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const img = new Image();
-      img.onload = function() {
-        const canvas = document.createElement('canvas');
-        let width = img.width;
-        let height = img.height;
-        const maxDim = 300; // Resizes image dimensions to avoid massive payloads
-
-        if (width > height) {
-          if (width > maxDim) { height *= maxDim / width; width = maxDim; }
-        } else {
-          if (height > maxDim) { width *= maxDim / height; height = maxDim; }
-        }
-
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
-        
-        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.2);
-        callback(compressedBase64);
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  }
-
-  function addEntrantRow() {
-    const container = document.getElementById('entrantsContainer');
-    const entrantCount = container.getElementsByClassName('entrant-row').length + 1;
-    
-    const div = document.createElement('div');
-    div.className = 'entrant-row';
-    const inputId = `entrant${entrantCount}`;
-    div.innerHTML = `<input type="text" class="form-input entrant-input auto-save" id="${inputId}" placeholder="Entrant ${entrantCount} Full Name & Employee ID" required>`;
-    container.appendChild(div);
-
-    document.getElementById('entryHeadcount').value = entrantCount;
-  }
-
-  function previewImg(event, imgId) {
-    const file = event.target.files[0];
-    if (file) {
-      compressImage(file, function(compressedData) {
-        const output = document.getElementById(imgId);
-        output.src = compressedData;
-        output.style.display = 'block';
-
-        if(imgId === 'previewPreEntrant') preEntrantPhotoBase64 = compressedData;
-        if(imgId === 'previewTbt') tbtPhotoBase64 = compressedData;
-        if(imgId === 'previewExit') exitPhotoBase64 = compressedData;
-      });
-    }
-  }
-
-  // FULL POWER AUTOMATE URL WITH SECURITY SIGNATURE INCLUDED
-  const webhookUrl = "https://default37cd273a1cec4aaea29741480ea54f.8d.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/62e0ced429bc4b2aa03c672bf333334b/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=hj17r1Zp5o87SzxxGK_CULg0KQFwE8MSEzOiGxYcvJo";
-
-  function isNumericOnly(val) {
-    return /^[0-9]+$/.test(String(val).trim());
-  }
-
-  async function handlePhase1Entry() {
-    const btn = document.getElementById('btnStart');
-    const btnText = document.getElementById('btnStartText');
-
-    const ptwNo = document.getElementById('ptwNo').value;
-    const spaceId = document.getElementById('spaceId').value;
-    const heightPermitNo = document.getElementById('heightPermitNo').value;
-    const lotoNo = document.getElementById('lotoNo').value;
-    const electricalCertNo = document.getElementById('electricalCertNo').value;
-    const deptSelect = document.getElementById('deptSelect').value;
-    const equipment = document.getElementById('equipment').value;
-    const workDesc = document.getElementById('workDesc').value;
-
-    const entrantInputs = document.querySelectorAll('.entrant-input');
-    let entrantsList = [];
-    entrantInputs.forEach((input, idx) => {
-      if(input.value.trim() !== "") entrantsList.push(`${idx + 1}. ${input.value.trim()}`);
+    document.addEventListener("DOMContentLoaded", () => {
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        document.getElementById("entryTime").value = now.toISOString().slice(0, 16);
     });
 
-    const headcount = entrantsList.length;
-    const attendantName = document.getElementById('attendantName').value;
-    const supervisorName = document.getElementById('supervisorName').value;
-    const rescuerName = document.getElementById('rescuerName').value;
+    document.getElementById("digitalEntryForm").addEventListener("submit", async function(event) {
+        event.preventDefault();
 
-    if(!isNumericOnly(ptwNo) || !isNumericOnly(spaceId) || !isNumericOnly(heightPermitNo) || !isNumericOnly(lotoNo) || !isNumericOnly(electricalCertNo)) {
-      alert("⚠️ Validation Error: Permit numbers MUST contain numbers only.");
-      return;
-    }
+        const submitBtn = document.getElementById("submitBtn");
+        const statusMsg = document.getElementById("statusMessage");
 
-    if(!deptSelect) { alert("⚠️ Mandatory Field Missing: Select Executing Department."); return; }
-    if(!equipment || !workDesc) { alert("⚠️ Mandatory Fields Missing: Fill Equipment and Work Description."); return; }
-    if(entrantsList.length === 0 || !attendantName || !supervisorName || !rescuerName) { alert("⚠️ Mandatory Personnel Missing: Fill Entrants, Attendant, Supervisor, and Rescuer."); return; }
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Submitting to Webhook...";
+        statusMsg.style.display = "none";
 
-    btn.disabled = true;
-    btnText.innerHTML = '⏳ Processing Registration...';
+        const webhookUrl = "https://default37cd273a1cec4aaea29741480ea54f.8d.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/62e0ced429bc4b2aa03c672bf333334b/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=hj17r1Zp5o87SzxxGK_CULg0KQFwE8MSEzOiGxYcvJo";
 
-    const areaClass = document.querySelector('input[name="areaClassification"]:checked').value;
-    const prePhotoStr = preEntrantPhotoBase64 ? preEntrantPhotoBase64 : "No Photo Uploaded";
-    const tbtPhotoStr = tbtPhotoBase64 ? tbtPhotoBase64 : "No Photo Uploaded";
+        const formData = {
+            PermitNo: document.getElementById("permitNo").value,
+            Department: document.getElementById("department").value,
+            Location: document.getElementById("location").value,
+            Status: document.getElementById("status").value,
+            Supervisor: document.getElementById("supervisor").value,
+            Attendant: document.getElementById("attendant").value,
+            TotalEntrants: parseInt(document.getElementById("totalEntrants").value, 10),
+            Timestamp: document.getElementById("entryTime").value,
+            EntrantsList: document.getElementById("entrantsList").value
+        };
 
-    const payload = {
-      eventType: "PHYSICAL ENTRY (WORK STARTED)",
-      ptwNo: String(ptwNo),
-      spaceId: String(spaceId),
-      heightPermitNo: String(heightPermitNo),
-      lotoNo: String(lotoNo),
-      electricalCertNo: String(electricalCertNo),
-      department: String(deptSelect),
-      areaClassification: String(areaClass),
-      equipment: String(equipment),
-      workDesc: String(workDesc),
-      totalHeadcount: String(headcount),
-      entrantsList: String(entrantsList.join(" | ")),
-      attendantName: String(attendantName),
-      supervisorName: String(supervisorName),
-      rescuerName: String(rescuerName),
-      preEntrantPhoto: String(prePhotoStr),
-      tbtPhoto: String(tbtPhotoStr),
-      timestamp: String(new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })),
-      exitPhoto: ""
-    };
+        try {
+            const response = await fetch(webhookUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(formData)
+            });
 
-    try {
-      const response = await fetch(webhookUrl, {
-        method: 'POST',
-        mode: 'cors',
-        headers: { 
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (response.ok || response.status === 202 || response.status === 200) {
-        clearDraftData();
-        document.getElementById('formSection').style.display = 'none';
-        document.getElementById('displayHeadcount').innerText = headcount;
-        document.getElementById('exitHeadcount').value = headcount;
-        document.getElementById('successScreen').style.display = 'block';
-        document.getElementById('permStatus').innerText = '2. ACTIVE WORK IN PROGRESS';
-        document.getElementById('permStatus').className = 'status-badge active';
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      } else {
-        const errText = await response.text();
-        alert(`❌ Server Error (${response.status}): ${errText}`);
-        btn.disabled = false;
-        btnText.innerHTML = '🚪 STEP 1: START WORK & ENTER CONFINED SPACE';
-      }
-    } catch(err) {
-      alert(`❌ Network Failure: ${err.message}`);
-      btn.disabled = false;
-      btnText.innerHTML = '🚪 STEP 1: START WORK & ENTER CONFINED SPACE';
-    }
-  }
-
-  function showPhase2ExitPanel() {
-    document.getElementById('successScreen').style.display = 'none';
-    document.getElementById('phase2Container').style.display = 'block';
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  async function handlePhase2Exit() {
-    const btn = document.getElementById('btnComplete'); 
-    const btnText = document.getElementById('btnCompleteText');
-
-    const exitHeadcount = document.getElementById('exitHeadcount').value;
-    const chkExitAttendance = document.getElementById('chkExitAttendance').checked;
-
-    if(!exitHeadcount || !isNumericOnly(exitHeadcount)) { alert("⚠️ Mandatory Field Missing: Enter Total Exiting Headcount (Numbers Only)."); return; }
-    if(!chkExitAttendance) { alert("⚠️ Mandatory Verification: Confirm exit attendance checkbox."); return; }
-
-    btn.disabled = true;
-    btnText.innerHTML = '⏳ Completing Exit Verification...';
-
-    const exitPhotoStr = exitPhotoBase64 ? exitPhotoBase64 : "No Photo Uploaded";
-
-    const payload = {
-      eventType: "PHYSICAL EXIT & PERMIT CLOSURE",
-      ptwNo: String(document.getElementById('ptwNo').value),
-      spaceId: String(document.getElementById('spaceId').value),
-      department: String(document.getElementById('deptSelect').value),
-      equipment: String(document.getElementById('equipment').value),
-      exitHeadcount: String(exitHeadcount),
-      timestamp: String(new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })),
-      exitPhoto: String(exitPhotoStr)
-    };
-
-    try {
-      const response = await fetch(webhookUrl, {
-        method: 'POST',
-        mode: 'cors',
-        headers: { 
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (response.ok || response.status === 202 || response.status === 200) {
-        clearDraftData();
-        document.getElementById('phase2Container').innerHTML = "<div class='success-screen' style='display:block;'><div style='font-size:50px;'>🎉</div><div class='success-title' style='color:#16a34a;'>PERMIT CLOSED SUCCESSFULLY</div><p style='color:#334155;'>Total Exited Headcount: " + exitHeadcount + " | Attendance Verified & Closed.</p></div>";
-        document.getElementById('permStatus').innerText = '3. PERMIT CLOSED';
-        document.getElementById('permStatus').className = 'status-badge closed';
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      } else {
-        const errText = await response.text();const webhookUrl
-        alert(`❌ Server Error (${response.status}): ${errText}`);
-        btn.disabled = false;
-        btnText.innerHTML = '✅ STEP 2: COMPLETE WORK & CLOSE PERMIT';
-      }
-    } catch(err) {
-      alert(`❌ Network Failure: ${err.message}`);
-      btn.disabled = false;
-      btnText.innerHTML = '✅ STEP 2: COMPLETE WORK & CLOSE PERMIT';
-    }
-  }
+            if (response.ok || response.status === 202) {
+                statusMsg.className = "status-message success";
+                statusMsg.innerText = "Registration successful! Power Automate flow triggered.";
+                document.getElementById("digitalEntryForm").reset();
+                
+                const now = new Date();
+                now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+                document.getElementById("entryTime").value = now.toISOString().slice(0, 16);
+            } else {
+                const errorDetails = await response.text();
+                console.error("HTTP Error Status:", response.status, errorDetails);
+                statusMsg.className = "status-message error";
+                statusMsg.innerText = `Submission failed (Status Code: ${response.status}). Check browser console.`;
+            }
+        } catch (error) {
+            console.error("Network / CORS Error:", error);
+            statusMsg.className = "status-message error";
+            statusMsg.innerText = "Network Error! Could not reach Power Automate endpoint. Check console.";
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerText = "Submit Registration & Trigger Notification";
+            statusMsg.style.display = "block";
+        }
+    });
 </script>
 
 </body>
