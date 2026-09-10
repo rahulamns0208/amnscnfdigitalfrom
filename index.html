@@ -169,7 +169,7 @@
             box-shadow: 0 0 0 2px rgba(200, 16, 46, 0.15);
         }
 
-        /* Clean Modern Toggle Chips for Hazards Box (Fixes Arrow Bug Completely) */
+        /* Clean Modern Toggle Chips for Hazards Box */
         .checkbox-group {
             display: flex;
             flex-direction: column;
@@ -398,7 +398,7 @@
             </div>
         </div>
 
-        <!-- Associated Permits - Dynamic Toggle Chips (No Arrows) -->
+        <!-- Associated Permits -->
         <div class="form-group">
             <label>Associated Hazards & Work Types *</label>
             <div class="checkbox-group">
@@ -445,19 +445,19 @@
         </div>
 
         <div class="form-group">
-            <label>Name & ID of Entrants</label>
+            <label>Name or Employee ID of Entrants</label>
             <div class="entrants-wrapper">
                 <table class="entrants-table" id="entrantsTable">
                     <thead>
                         <tr>
                             <th style="width: 12%;">#</th>
-                            <th>Entrant Name & Employee/Contractor ID</th>
+                            <th>Entrant Name or Employee ID</th>
                         </tr>
                     </thead>
                     <tbody id="entrantsTableBody">
                         <tr>
                             <td>1</td>
-                            <td><input type="text" class="entrant-input" required placeholder="e.g. Rahul Kumawat (EMP12345)"></td>
+                            <td><input type="text" class="entrant-input" required placeholder="Enter Name or Employee ID"></td>
                         </tr>
                     </tbody>
                 </table>
@@ -467,18 +467,18 @@
         <!-- Personnel Details -->
         <div class="row">
             <div class="form-group">
-                <label for="attendantName">Name & ID of Attendant *</label>
-                <input type="text" id="attendantName" required placeholder="Attendant Name & ID">
+                <label for="attendantName">Name or Employee ID of Attendant *</label>
+                <input type="text" id="attendantName" required placeholder="Attendant Name or Employee ID">
             </div>
             <div class="form-group">
-                <label for="supervisorName">Name of Supervisor *</label>
-                <input type="text" id="supervisorName" required placeholder="Supervisor Name">
+                <label for="supervisorName">Name or Employee ID of Supervisor *</label>
+                <input type="text" id="supervisorName" required placeholder="Supervisor Name or Employee ID">
             </div>
         </div>
 
         <div class="form-group">
-            <label for="rescuePersonName">Name of Rescue Person *</label>
-            <input type="text" id="rescuePersonName" required placeholder="Rescue Person Name">
+            <label for="rescuePersonName">Name or Employee ID of Rescue Person *</label>
+            <input type="text" id="rescuePersonName" required placeholder="Rescue Person Name or Employee ID">
         </div>
 
         <button type="submit" class="btn-submit" id="submitBtn">Enter in Confined Space</button>
@@ -543,7 +543,7 @@
             const tr = document.createElement("tr");
             tr.innerHTML = `
                 <td>${i}</td>
-                <td><input type="text" class="entrant-input" required placeholder="Entrant ${i} Name & ID"></td>
+                <td><input type="text" class="entrant-input" required placeholder="Entrant ${i} Name or Employee ID"></td>
             `;
             tbody.appendChild(tr);
         }
@@ -598,7 +598,7 @@
                 document.getElementById("entrantsTableBody").innerHTML = `
                     <tr>
                         <td>1</td>
-                        <td><input type="text" class="entrant-input" required placeholder="e.g. Rahul Kumawat (EMP12345)"></td>
+                        <td><input type="text" class="entrant-input" required placeholder="Enter Name or Employee ID"></td>
                     </tr>`;
             } else {
                 statusMsg.className = "status-message error";
