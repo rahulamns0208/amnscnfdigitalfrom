@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AM/NS India - Confined Space & GHA FPS Registration</title>
+    <title>AM/NS India - Confined Space Entry Portal</title>
     <style>
         :root {
             --primary-color: #c8102e;
@@ -23,7 +23,7 @@
         }
 
         .container {
-            max-width: 800px;
+            max-width: 850px;
             margin: 0 auto;
             background: var(--card-bg);
             padding: 30px;
@@ -52,51 +52,19 @@
             font-weight: 500;
         }
 
-        .tab-navigation {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .tab-btn {
-            flex: 1;
-            padding: 12px;
-            border: 1px solid var(--border-color);
-            background: #e9ecef;
-            font-weight: bold;
-            cursor: pointer;
-            border-radius: 4px;
-            text-align: center;
-        }
-
-        .tab-btn.active {
-            background: var(--primary-color);
-            color: #ffffff;
-            border-color: var(--primary-color);
-        }
-
-        .form-section {
-            display: none;
-        }
-
-        .form-section.active {
-            display: block;
-        }
-
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
 
         label {
             display: block;
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             color: var(--secondary-color);
         }
 
         input[type="text"],
         input[type="number"],
-        input[type="datetime-local"],
         select,
         textarea {
             width: 100%;
@@ -121,16 +89,50 @@
             flex: 1;
         }
 
+        .checkbox-group {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+        }
+
+        .entrants-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .entrants-table th, .entrants-table td {
+            border: 1px solid var(--border-color);
+            padding: 8px;
+            text-align: left;
+        }
+
+        .entrants-table th {
+            background-color: #f1f1f1;
+        }
+
         .btn-submit {
             background-color: var(--primary-color);
             color: #ffffff;
             border: none;
-            padding: 12px 20px;
+            padding: 14px 20px;
             font-size: 16px;
             font-weight: bold;
             border-radius: 4px;
             cursor: pointer;
             width: 100%;
+            margin-top: 10px;
             transition: background 0.3s ease;
         }
 
@@ -165,215 +167,214 @@
 <div class="container">
     <div class="header">
         <h1>AM/NS INDIA</h1>
-        <h2>Confined Space & GHA FPS Permit Management</h2>
+        <h2>Confined Space & Gas Hazard Area Entry Portal</h2>
     </div>
 
-    <!-- Mode Selector Tabs -->
-    <div class="tab-navigation">
-        <button class="tab-btn active" id="entryTabBtn" onclick="switchTab('entry')">1. Entry Registration</button>
-        <button class="tab-btn" id="exitTabBtn" onclick="switchTab('exit')">2. Exit & Closure Sign-off</button>
-    </div>
-
-    <!-- FORM 1: ENTRY DATA -->
-    <div id="entrySection" class="form-section active">
-        <form id="entryForm">
-            <div class="row">
-                <div class="form-group">
-                    <label for="entryPermitNo">Master Permit No. *</label>
-                    <input type="text" id="entryPermitNo" required placeholder="e.g., PER-2026-001">
-                </div>
-                <div class="form-group">
-                    <label for="entryDepartment">Department *</label>
-                    <select id="entryDepartment" required>
-                        <option value="">Select Department</option>
-                        <option value="CRM-Production">CRM - Production</option>
-                        <option value="CRM-Mechanical">CRM - Mechanical</option>
-                        <option value="CRM-Electrical">CRM - Electrical</option>
-                        <option value="ARP">ARP</option>
-                        <option value="Pickling">Pickling</option>
-                        <option value="CGL">CGL</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="form-group">
-                    <label for="entryLocation">Exact Location / Equipment *</label>
-                    <input type="text" id="entryLocation" required placeholder="e.g., Acid Pit / Tank Basement">
-                </div>
-                <div class="form-group">
-                    <label for="entrySupervisor">Supervisor / Issuer Name *</label>
-                    <input type="text" id="entrySupervisor" required placeholder="Supervisor Name">
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="form-group">
-                    <label for="entryAttendant">Standby Attendant Name *</label>
-                    <input type="text" id="entryAttendant" required placeholder="Attendant Name">
-                </div>
-                <div class="form-group">
-                    <label for="entryTotalCount">Total Entrants Count *</label>
-                    <input type="number" id="entryTotalCount" min="1" required placeholder="e.g., 4">
-                </div>
-            </div>
-
+    <form id="confinedEntryForm">
+        <!-- Area, Department & Work Permit No -->
+        <div class="row">
             <div class="form-group">
-                <label for="entryTime">Entry Timestamp *</label>
-                <input type="datetime-local" id="entryTime" required>
-            </div>
-
-            <div class="form-group">
-                <label for="entrantsList">Names / IDs of Personnel Entering</label>
-                <textarea id="entrantsList" rows="3" placeholder="Enter personnel details separated by commas..."></textarea>
-            </div>
-
-            <button type="submit" class="btn-submit" id="entrySubmitBtn">Submit Entry & Send Entry Mail</button>
-        </form>
-    </div>
-
-    <!-- FORM 2: EXIT DATA -->
-    <div id="exitSection" class="form-section">
-        <form id="exitForm">
-            <div class="row">
-                <div class="form-group">
-                    <label for="exitPermitNo">Master Permit No. *</label>
-                    <input type="text" id="exitPermitNo" required placeholder="e.g., PER-2026-001">
-                </div>
-                <div class="form-group">
-                    <label for="exitDepartment">Department *</label>
-                    <select id="exitDepartment" required>
-                        <option value="">Select Department</option>
-                        <option value="CRM-Production">CRM - Production</option>
-                        <option value="CRM-Mechanical">CRM - Mechanical</option>
-                        <option value="CRM-Electrical">CRM - Electrical</option>
-                        <option value="ARP">ARP</option>
-                        <option value="Pickling">Pickling</option>
-                        <option value="CGL">CGL</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="form-group">
-                    <label for="exitSupervisor">Closure Supervisor Name *</label>
-                    <input type="text" id="exitSupervisor" required placeholder="Supervisor Name">
-                </div>
-                <div class="form-group">
-                    <label for="exitTime">Exit Timestamp *</label>
-                    <input type="datetime-local" id="exitTime" required>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="allEntrantsOut">Confirmation *</label>
-                <select id="allEntrantsOut" required>
-                    <option value="YES">Yes - All entrants are physically verified OUT</option>
-                    <option value="NO">No - Person missing (Do not close)</option>
+                <label for="area">Area Category *</label>
+                <select id="area" required onchange="generateCertNumbers()">
+                    <option value="">Select Area</option>
+                    <option value="NGHA">Confined Space (NGHA)</option>
+                    <option value="GHA">Confined Space (GHA)</option>
+                    <option value="GAS_HAZARD">Gas Hazard Area</option>
                 </select>
             </div>
-
             <div class="form-group">
-                <label for="exitRemarks">Work Completion Remarks</label>
-                <textarea id="exitRemarks" rows="3" placeholder="Enter work summary and safe housekeeping remarks..."></textarea>
+                <label for="department">Department *</label>
+                <select id="department" required onchange="generateCertNumbers()">
+                    <option value="">Select Department</option>
+                    <option value="CGL_MECH">CGL Mech</option>
+                    <option value="CGL_PROD">CGL Prod</option>
+                    <option value="CGL_ELEC">CGL Elec</option>
+                    <option value="CRM_MECH">CRM Mech</option>
+                    <option value="CRM_PROD">CRM Prod</option>
+                    <option value="CRM_ELEC">CRM Elec</option>
+                    <option value="ARP">ARP</option>
+                    <option value="PICKLING">Pickling</option>
+                </select>
             </div>
+        </div>
 
-            <button type="submit" class="btn-submit" id="exitSubmitBtn">Submit Exit & Send Close Mail</button>
-        </form>
-    </div>
+        <div class="row">
+            <div class="form-group">
+                <label for="workPermitNo">Work Permit No. *</label>
+                <input type="text" id="workPermitNo" required placeholder="Enter Work Permit Number">
+            </div>
+            <div class="form-group">
+                <label for="confCertNo">Confined Space Certificate No. *</label>
+                <select id="confCertNo" required>
+                    <option value="">Select Area & Dept First</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Checkboxes for Associated Permits -->
+        <div class="form-group">
+            <label>Associated Hazards & Work Types *</label>
+            <div class="checkbox-group">
+                <div class="checkbox-item">
+                    <label for="workAtHeight">Work at Height:</label>
+                    <select id="workAtHeight" required style="width: auto;">
+                        <option value="NO">NO</option>
+                        <option value="YES">YES</option>
+                    </select>
+                </div>
+                <div class="checkbox-item">
+                    <label for="electricalWork">Electrical Work:</label>
+                    <select id="electricalWork" required style="width: auto;">
+                        <option value="NO">NO</option>
+                        <option value="YES">YES</option>
+                    </select>
+                </div>
+                <div class="checkbox-item">
+                    <label for="weldingWork">Welding / Cutting Work:</label>
+                    <select id="weldingWork" required style="width: auto;">
+                        <option value="NO">NO</option>
+                        <option value="YES">YES</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Work Description -->
+        <div class="form-group">
+            <label for="workDescription">Work Description *</label>
+            <textarea id="workDescription" rows="3" required placeholder="Describe the job to be performed..."></textarea>
+        </div>
+
+        <!-- Entrants Dynamic Rows -->
+        <div class="form-group">
+            <label for="noOfEntrants">Number of Entrants *</label>
+            <input type="number" id="noOfEntrants" min="1" max="60" required placeholder="Enter count of entrants" onchange="generateEntrantRows()">
+        </div>
+
+        <div class="form-group">
+            <label>Name & ID of Entrants</label>
+            <table class="entrants-table" id="entrantsTable">
+                <thead>
+                    <tr>
+                        <th style="width: 10%;">#</th>
+                        <th>Entrant Name & Employee/Contractor ID</th>
+                    </tr>
+                </thead>
+                <tbody id="entrantsTableBody">
+                    <tr>
+                        <td>1</td>
+                        <td><input type="text" class="entrant-input" required placeholder="e.g. John Doe (EMP12345)"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Personnel Details -->
+        <div class="row">
+            <div class="form-group">
+                <label for="attendantName">Name & ID of Attendant *</label>
+                <input type="text" id="attendantName" required placeholder="Attendant Name & ID">
+            </div>
+            <div class="form-group">
+                <label for="supervisorName">Name of Supervisor *</label>
+                <input type="text" id="supervisorName" required placeholder="Supervisor Name">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="rescuePersonName">Name of Rescue Person *</label>
+            <input type="text" id="rescuePersonName" required placeholder="Rescue Person Name">
+        </div>
+
+        <button type="submit" class="btn-submit" id="submitBtn">Enter in Confined Space</button>
+    </form>
 
     <div id="statusMessage" class="status-message"></div>
 </div>
 
 <script>
-    // Webhook Configuration URLs
-    // Place your Power Automate HTTP trigger URLs here
-    const ENTRY_WEBHOOK_URL = "https://default37cd273a1cec4aaea29741480ea54f.8d.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/62e0ced429bc4b2aa03c672bf333334b/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=hj17r1Zp5o87SzxxGK_CULg0KQFwE8MSEzOiGxYcvJo";
-    const EXIT_WEBHOOK_URL = "https://default37cd273a1cec4aaea29741480ea54f.8d.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/62e0ced429bc4b2aa03c672bf333334b/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=hj17r1Zp5o87SzxxGK_CULg0KQFwE8MSEzOiGxYcvJo";
+    // Power Automate Webhook Endpoint URL
+    const WEBHOOK_URL = "https://default37cd273a1cec4aaea29741480ea54f.8d.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/62e0ced429bc4b2aa03c672bf333334b/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=hj17r1Zp5o87SzxxGK_CULg0KQFwE8MSEzOiGxYcvJo";
 
-    // Set initial timestamps
-    document.addEventListener("DOMContentLoaded", () => {
-        resetTimestamps();
-    });
+    // Dynamic Certificate Number Generator
+    function generateCertNumbers() {
+        const area = document.getElementById("area").value;
+        const dept = document.getElementById("department").value;
+        const certDropdown = document.getElementById("confCertNo");
 
-    function resetTimestamps() {
-        const now = new Date();
-        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-        const formatted = now.toISOString().slice(0, 16);
-        document.getElementById("entryTime").value = formatted;
-        document.getElementById("exitTime").value = formatted;
-    }
+        certDropdown.innerHTML = '<option value="">Select Certificate Number</option>';
 
-    // Switch between Entry and Exit Tabs
-    function switchTab(type) {
-        const entryTab = document.getElementById("entryTabBtn");
-        const exitTab = document.getElementById("exitTabBtn");
-        const entrySec = document.getElementById("entrySection");
-        const exitSec = document.getElementById("exitSection");
-        const statusMsg = document.getElementById("statusMessage");
+        if (!area || !dept) return;
 
-        statusMsg.style.display = "none";
+        let formattedDept = dept.replace("_", "/");
 
-        if (type === 'entry') {
-            entryTab.classList.add("active");
-            exitTab.classList.remove("active");
-            entrySec.classList.add("active");
-            exitSec.classList.remove("active");
-        } else {
-            exitTab.classList.add("active");
-            entryTab.classList.remove("active");
-            exitSec.classList.add("active");
-            entrySec.classList.remove("active");
+        for (let i = 1; i <= 60; i++) {
+            let certNum = `AMNS/${formattedDept}/CNF/${i}/${area}`;
+            let option = document.createElement("option");
+            option.value = certNum;
+            option.textContent = certNum;
+            certDropdown.appendChild(option);
         }
     }
 
-    // 1. SUBMIT ENTRY DATA
-    document.getElementById("entryForm").addEventListener("submit", async function(e) {
+    // Dynamic Entrant Rows Generator
+    function generateEntrantRows() {
+        const count = parseInt(document.getElementById("noOfEntrants").value, 10) || 0;
+        const tbody = document.getElementById("entrantsTableBody");
+        tbody.innerHTML = "";
+
+        if (count < 1) return;
+
+        for (let i = 1; i <= count; i++) {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${i}</td>
+                <td><input type="text" class="entrant-input" required placeholder="Entrant ${i} Name & ID"></td>
+            `;
+            tbody.appendChild(tr);
+        }
+    }
+
+    // Form Submission & Webhook Triggering
+    document.getElementById("confinedEntryForm").addEventListener("submit", async function(e) {
         e.preventDefault();
-        
-        const payload = {
-            RecordType: "ENTRY_DATA",
-            PermitNo: document.getElementById("entryPermitNo").value,
-            Department: document.getElementById("entryDepartment").value,
-            Location: document.getElementById("entryLocation").value,
-            Supervisor: document.getElementById("entrySupervisor").value,
-            Attendant: document.getElementById("entryAttendant").value,
-            TotalEntrants: parseInt(document.getElementById("entryTotalCount").value, 10),
-            Timestamp: document.getElementById("entryTime").value,
-            EntrantsList: document.getElementById("entrantsList").value
-        };
 
-        await sendDataToWebhook(ENTRY_WEBHOOK_URL, payload, "entrySubmitBtn", "Entry notification flow triggered successfully!");
-    });
-
-    // 2. SUBMIT EXIT / CLOSURE DATA
-    document.getElementById("exitForm").addEventListener("submit", async function(e) {
-        e.preventDefault();
-
-        const payload = {
-            RecordType: "EXIT_DATA",
-            PermitNo: document.getElementById("exitPermitNo").value,
-            Department: document.getElementById("exitDepartment").value,
-            Supervisor: document.getElementById("exitSupervisor").value,
-            Timestamp: document.getElementById("exitTime").value,
-            AllEntrantsOut: document.getElementById("allEntrantsOut").value,
-            Remarks: document.getElementById("exitRemarks").value
-        };
-
-        await sendDataToWebhook(EXIT_WEBHOOK_URL, payload, "exitSubmitBtn", "Permit closure notification flow triggered successfully!");
-    });
-
-    // Shared Post Execution Function
-    async function sendDataToWebhook(url, payload, btnId, successText) {
-        const btn = document.getElementById(btnId);
+        const submitBtn = document.getElementById("submitBtn");
         const statusMsg = document.getElementById("statusMessage");
 
-        btn.disabled = true;
-        btn.innerText = "Sending Data...";
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Submitting Entry Data...";
         statusMsg.style.display = "none";
 
+        // Collect all entrant details into an array
+        const entrantInputs = document.querySelectorAll(".entrant-input");
+        const entrantsList = [];
+        entrantInputs.forEach((input, index) => {
+            if (input.value.trim() !== "") {
+                entrantsList.push(`${index + 1}. ${input.value.trim()}`);
+            }
+        });
+
+        // Construct JSON Payload
+        const payload = {
+            WorkPermitNo: document.getElementById("workPermitNo").value,
+            ConfinedSpaceCertNo: document.getElementById("confCertNo").value,
+            WorkAtHeight: document.getElementById("workAtHeight").value,
+            ElectricalWork: document.getElementById("electricalWork").value,
+            WeldingCuttingWork: document.getElementById("weldingWork").value,
+            AreaCategory: document.getElementById("area").value,
+            Department: document.getElementById("department").value,
+            WorkDescription: document.getElementById("workDescription").value,
+            NoOfEntrants: entrantsList.length,
+            EntrantsList: entrantsList.join("\n"),
+            AttendantName: document.getElementById("attendantName").value,
+            SupervisorName: document.getElementById("supervisorName").value,
+            RescuePersonName: document.getElementById("rescuePersonName").value,
+            Timestamp: new Date().toLocaleString()
+        };
+
         try {
-            const response = await fetch(url, {
+            const response = await fetch(WEBHOOK_URL, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
@@ -381,30 +382,29 @@
 
             if (response.ok || response.status === 202) {
                 statusMsg.className = "status-message success";
-                statusMsg.innerText = successText;
-                
-                if (payload.RecordType === "ENTRY_DATA") {
-                    document.getElementById("entryForm").reset();
-                } else {
-                    document.getElementById("exitForm").reset();
-                }
-                resetTimestamps();
+                statusMsg.innerText = "Entry registered successfully! Email sent to Department HOD & Chairman.";
+                document.getElementById("confinedEntryForm").reset();
+                document.getElementById("entrantsTableBody").innerHTML = `
+                    <tr>
+                        <td>1</td>
+                        <td><input type="text" class="entrant-input" required placeholder="e.g. John Doe (EMP12345)"></td>
+                    </tr>`;
             } else {
                 const errText = await response.text();
-                console.error("Response Error:", response.status, errText);
+                console.error("HTTP Response Error:", response.status, errText);
                 statusMsg.className = "status-message error";
-                statusMsg.innerText = `Error (${response.status}): Could not complete trigger. Check browser console.`;
+                statusMsg.innerText = `Submission failed (${response.status}). Check browser console.`;
             }
         } catch (err) {
             console.error("Network Error:", err);
             statusMsg.className = "status-message error";
             statusMsg.innerText = "Network Error! Could not reach Power Automate endpoint.";
         } finally {
-            btn.disabled = false;
-            btn.innerText = payload.RecordType === "ENTRY_DATA" ? "Submit Entry & Send Entry Mail" : "Submit Exit & Send Close Mail";
+            submitBtn.disabled = false;
+            submitBtn.innerText = "Enter in Confined Space";
             statusMsg.style.display = "block";
         }
-    }
+    });
 </script>
 
 </body>
