@@ -147,19 +147,18 @@
             background-color: #fff;
         }
 
-        /* Universal Clean Select Field Formatting (Fixes Windows Arrow Glitch) */
+        /* Clean Dropdown Arrow CSS for Standard Dropdowns */
         select {
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
             background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23333333%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
             background-repeat: no-repeat;
-            background-position: right 10px center;
+            background-position: right 12px center;
             background-size: 10px auto;
-            padding-right: 28px !important; /* Space for arrow icon */
+            padding-right: 30px !important;
         }
 
-        /* Removes native Microsoft Edge/IE arrow overlay */
         select::-ms-expand {
             display: none;
         }
@@ -170,12 +169,13 @@
             box-shadow: 0 0 0 2px rgba(200, 16, 46, 0.15);
         }
 
+        /* Clean Modern Toggle Chips for Hazards Box (Fixes Arrow Bug Completely) */
         .checkbox-group {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
             background: #f8f9fa;
-            padding: 12px;
+            padding: 14px;
             border: 1px solid var(--border-color);
             border-radius: 6px;
         }
@@ -188,11 +188,33 @@
             font-size: 13px;
         }
 
-        .checkbox-item select {
-            width: auto;
-            min-width: 75px; /* Ensures text doesn't clash with arrow on small boxes */
-            padding: 6px 28px 6px 10px;
-            font-size: 13px;
+        .toggle-switch {
+            display: flex;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            overflow: hidden;
+            background-color: #ffffff;
+        }
+
+        .toggle-switch input[type="radio"] {
+            display: none;
+        }
+
+        .toggle-switch label {
+            padding: 6px 14px;
+            margin: 0;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            background-color: #ffffff;
+            color: #555555;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .toggle-switch input[type="radio"]:checked + label {
+            background-color: var(--primary-color);
+            color: #ffffff;
         }
 
         .entrants-wrapper {
@@ -293,7 +315,7 @@
 
             .checkbox-item {
                 flex-direction: row;
-                gap: 8px;
+                gap: 10px;
             }
         }
     </style>
@@ -376,30 +398,36 @@
             </div>
         </div>
 
-        <!-- Associated Permits -->
+        <!-- Associated Permits - Dynamic Toggle Chips (No Arrows) -->
         <div class="form-group">
             <label>Associated Hazards & Work Types *</label>
             <div class="checkbox-group">
                 <div class="checkbox-item">
                     <span>Work at Height:</span>
-                    <select id="workAtHeight" required>
-                        <option value="NO">NO</option>
-                        <option value="YES">YES</option>
-                    </select>
+                    <div class="toggle-switch">
+                        <input type="radio" id="heightNo" name="workAtHeight" value="NO" checked>
+                        <label for="heightNo">NO</label>
+                        <input type="radio" id="heightYes" name="workAtHeight" value="YES">
+                        <label for="heightYes">YES</label>
+                    </div>
                 </div>
                 <div class="checkbox-item">
                     <span>Electrical Work:</span>
-                    <select id="electricalWork" required>
-                        <option value="NO">NO</option>
-                        <option value="YES">YES</option>
-                    </select>
+                    <div class="toggle-switch">
+                        <input type="radio" id="elecNo" name="electricalWork" value="NO" checked>
+                        <label for="elecNo">NO</label>
+                        <input type="radio" id="elecYes" name="electricalWork" value="YES">
+                        <label for="elecYes">YES</label>
+                    </div>
                 </div>
                 <div class="checkbox-item">
-                    <span>Welding / Cutting Work:</span>
-                    <select id="weldingWork" required>
-                        <option value="NO">NO</option>
-                        <option value="YES">YES</option>
-                    </select>
+                    <span>Welding / Cutting:</span>
+                    <div class="toggle-switch">
+                        <input type="radio" id="weldNo" name="weldingWork" value="NO" checked>
+                        <label for="weldNo">NO</label>
+                        <input type="radio" id="weldYes" name="weldingWork" value="YES">
+                        <label for="weldYes">YES</label>
+                    </div>
                 </div>
             </div>
         </div>
@@ -542,9 +570,9 @@
         const payload = {
             WorkPermitNo: document.getElementById("workPermitNo").value,
             ConfinedSpaceCertNo: document.getElementById("confCertNo").value,
-            WorkAtHeight: document.getElementById("workAtHeight").value,
-            ElectricalWork: document.getElementById("electricalWork").value,
-            WeldingCuttingWork: document.getElementById("weldingWork").value,
+            WorkAtHeight: document.querySelector('input[name="workAtHeight"]:checked').value,
+            ElectricalWork: document.querySelector('input[name="electricalWork"]:checked').value,
+            WeldingCuttingWork: document.querySelector('input[name="weldingWork"]:checked').value,
             AreaCategory: document.getElementById("area").value,
             Department: document.getElementById("department").value,
             WorkDescription: document.getElementById("workDescription").value,
