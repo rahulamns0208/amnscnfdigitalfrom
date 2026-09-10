@@ -7,6 +7,7 @@
     <style>
         :root {
             --primary-color: #c8102e;
+            --primary-hover: #a00c23;
             --secondary-color: #222222;
             --bg-color: #f4f6f9;
             --card-bg: #ffffff;
@@ -14,46 +15,52 @@
             --border-color: #cccccc;
         }
 
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
             margin: 0;
-            padding: 20px;
+            padding: 12px;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .container {
             max-width: 850px;
             margin: 0 auto;
             background: var(--card-bg);
-            padding: 30px;
+            padding: 20px 16px;
             border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
         }
 
         .header {
             text-align: center;
             border-bottom: 3px solid var(--primary-color);
-            padding-bottom: 15px;
-            margin-bottom: 25px;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
         }
 
         .header h1 {
             color: var(--primary-color);
             margin: 0;
-            font-size: 24px;
+            font-size: 20px;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .header h2 {
             color: var(--secondary-color);
-            margin: 5px 0 0 0;
-            font-size: 16px;
+            margin: 6px 0 0 0;
+            font-size: 14px;
             font-weight: 500;
         }
 
         .form-group {
-            margin-bottom: 18px;
+            margin-bottom: 16px;
         }
 
         label {
@@ -61,6 +68,14 @@
             font-weight: 600;
             margin-bottom: 6px;
             color: var(--secondary-color);
+            font-size: 14px;
+        }
+
+        /* Responsive Grid System */
+        .row {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
         }
 
         input[type="text"],
@@ -68,49 +83,66 @@
         select,
         textarea {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             border: 1px solid var(--border-color);
-            border-radius: 4px;
-            box-sizing: border-box;
-            font-size: 14px;
+            border-radius: 6px;
+            font-size: 15px; /* Prevents auto-zoom on iOS safari */
+            background-color: #fff;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        /* Custom Dropdown Styling for Uniform Mobile Render */
+        select {
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23333333%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right 12px top 50%;
+            background-size: 10px auto;
+            padding-right: 30px;
         }
 
         input:focus, select:focus, textarea:focus {
             outline: none;
             border-color: var(--primary-color);
-        }
-
-        .row {
-            display: flex;
-            gap: 15px;
-        }
-
-        .row .form-group {
-            flex: 1;
+            box-shadow: 0 0 0 2px rgba(200, 16, 46, 0.15);
         }
 
         .checkbox-group {
             display: flex;
-            gap: 20px;
-            align-items: center;
+            flex-direction: column;
+            gap: 12px;
             background: #f8f9fa;
-            padding: 12px;
+            padding: 14px;
             border: 1px solid var(--border-color);
-            border-radius: 4px;
-            flex-wrap: wrap;
+            border-radius: 6px;
         }
 
         .checkbox-item {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 6px;
             font-weight: 600;
+            font-size: 14px;
+        }
+
+        .checkbox-item select {
+            width: 45%;
+            padding: 8px 10px;
+            font-size: 14px;
+        }
+
+        /* Mobile Responsive Entrants Container */
+        .entrants-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .entrants-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
+            margin-top: 8px;
+            min-width: 280px;
         }
 
         .entrants-table th, .entrants-table td {
@@ -121,32 +153,35 @@
 
         .entrants-table th {
             background-color: #f1f1f1;
+            font-size: 13px;
         }
 
         .btn-submit {
             background-color: var(--primary-color);
             color: #ffffff;
             border: none;
-            padding: 14px 20px;
+            padding: 16px;
             font-size: 16px;
             font-weight: bold;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
             width: 100%;
-            margin-top: 10px;
-            transition: background 0.3s ease;
+            margin-top: 12px;
+            transition: background 0.2s ease;
+            touch-action: manipulation;
         }
 
-        .btn-submit:hover {
-            background-color: #a00c23;
+        .btn-submit:active {
+            background-color: var(--primary-hover);
         }
 
         .status-message {
             margin-top: 15px;
-            padding: 10px;
-            border-radius: 4px;
+            padding: 12px;
+            border-radius: 6px;
             display: none;
             text-align: center;
+            font-size: 14px;
             font-weight: bold;
         }
 
@@ -160,6 +195,48 @@
             background-color: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
+        }
+
+        /* Tablet & Desktop Adjustments */
+        @media (min-width: 600px) {
+            body {
+                padding: 20px;
+            }
+
+            .container {
+                padding: 30px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .header h2 {
+                font-size: 16px;
+            }
+
+            .row {
+                flex-direction: row;
+                gap: 15px;
+            }
+
+            .row .form-group {
+                flex: 1;
+            }
+
+            .checkbox-group {
+                flex-direction: row;
+                justify-content: space-between;
+            }
+
+            .checkbox-item {
+                flex-direction: row;
+                gap: 8px;
+            }
+
+            .checkbox-item select {
+                width: auto;
+            }
         }
     </style>
 </head>
@@ -234,22 +311,22 @@
             <label>Associated Hazards & Work Types *</label>
             <div class="checkbox-group">
                 <div class="checkbox-item">
-                    <label for="workAtHeight">Work at Height:</label>
-                    <select id="workAtHeight" required style="width: auto;">
+                    <span>Work at Height:</span>
+                    <select id="workAtHeight" required>
                         <option value="NO">NO</option>
                         <option value="YES">YES</option>
                     </select>
                 </div>
                 <div class="checkbox-item">
-                    <label for="electricalWork">Electrical Work:</label>
-                    <select id="electricalWork" required style="width: auto;">
+                    <span>Electrical Work:</span>
+                    <select id="electricalWork" required>
                         <option value="NO">NO</option>
                         <option value="YES">YES</option>
                     </select>
                 </div>
                 <div class="checkbox-item">
-                    <label for="weldingWork">Welding / Cutting Work:</label>
-                    <select id="weldingWork" required style="width: auto;">
+                    <span>Welding / Cutting Work:</span>
+                    <select id="weldingWork" required>
                         <option value="NO">NO</option>
                         <option value="YES">YES</option>
                     </select>
@@ -263,7 +340,7 @@
             <textarea id="workDescription" rows="3" required placeholder="Describe the job to be performed..."></textarea>
         </div>
 
-        <!-- Entrants Count & Dynamic Rows -->
+        <!-- Entrants Count & Dynamic Table -->
         <div class="form-group">
             <label for="noOfEntrants">Number of Entrants *</label>
             <input type="number" id="noOfEntrants" min="1" max="60" required placeholder="Enter count of entrants" onchange="generateEntrantRows()">
@@ -271,20 +348,22 @@
 
         <div class="form-group">
             <label>Name & ID of Entrants</label>
-            <table class="entrants-table" id="entrantsTable">
-                <thead>
-                    <tr>
-                        <th style="width: 10%;">#</th>
-                        <th>Entrant Name & Employee/Contractor ID</th>
-                    </tr>
-                </thead>
-                <tbody id="entrantsTableBody">
-                    <tr>
-                        <td>1</td>
-                        <td><input type="text" class="entrant-input" required placeholder="e.g. Rahul Kumawat (EMP12345)"></td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="entrants-wrapper">
+                <table class="entrants-table" id="entrantsTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 12%;">#</th>
+                            <th>Entrant Name & Employee/Contractor ID</th>
+                        </tr>
+                    </thead>
+                    <tbody id="entrantsTableBody">
+                        <tr>
+                            <td>1</td>
+                            <td><input type="text" class="entrant-input" required placeholder="e.g. Rahul Kumawat (EMP12345)"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <!-- Personnel Details -->
@@ -311,10 +390,8 @@
 </div>
 
 <script>
-    // Replace with your active Power Automate HTTP Post Endpoint URL
     const WEBHOOK_URL = "https://default37cd273a1cec4aaea29741480ea54f.8d.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/62e0ced429bc4b2aa03c672bf333334b/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=hj17r1Zp5o87SzxxGK_CULg0KQFwE8MSEzOiGxYcvJo";
 
-    // Dynamic Certificate Number Generator
     function generateCertNumbers() {
         const area = document.getElementById("area").value;
         const dept = document.getElementById("department").value;
@@ -335,7 +412,6 @@
         }
     }
 
-    // Dynamic Entrant Rows Generator
     function generateEntrantRows() {
         const count = parseInt(document.getElementById("noOfEntrants").value, 10) || 0;
         const tbody = document.getElementById("entrantsTableBody");
@@ -353,7 +429,6 @@
         }
     }
 
-    // Form Submission & Webhook Triggering
     document.getElementById("confinedEntryForm").addEventListener("submit", async function(e) {
         e.preventDefault();
 
@@ -361,10 +436,9 @@
         const statusMsg = document.getElementById("statusMessage");
 
         submitBtn.disabled = true;
-        submitBtn.innerText = "Submitting Entry Data...";
+        submitBtn.innerText = "Submitting...";
         statusMsg.style.display = "none";
 
-        // Collect entrant inputs
         const entrantInputs = document.querySelectorAll(".entrant-input");
         const entrantsList = [];
         entrantInputs.forEach((input, index) => {
@@ -373,7 +447,6 @@
             }
         });
 
-        // JSON Payload Construction
         const payload = {
             WorkPermitNo: document.getElementById("workPermitNo").value,
             ConfinedSpaceCertNo: document.getElementById("confCertNo").value,
@@ -400,7 +473,7 @@
 
             if (response.ok || response.status === 202) {
                 statusMsg.className = "status-message success";
-                statusMsg.innerText = "Entry registered successfully! Notification sent to Department HOD & Chairman.";
+                statusMsg.innerText = "Entry registered successfully!";
                 document.getElementById("confinedEntryForm").reset();
                 document.getElementById("entrantsTableBody").innerHTML = `
                     <tr>
@@ -408,13 +481,10 @@
                         <td><input type="text" class="entrant-input" required placeholder="e.g. Rahul Kumawat (EMP12345)"></td>
                     </tr>`;
             } else {
-                const errText = await response.text();
-                console.error("HTTP Response Error:", response.status, errText);
                 statusMsg.className = "status-message error";
                 statusMsg.innerText = `Submission failed (${response.status}).`;
             }
         } catch (err) {
-            console.error("Network Error:", err);
             statusMsg.className = "status-message error";
             statusMsg.innerText = "Network Error! Power Automate endpoint unreachable.";
         } finally {
