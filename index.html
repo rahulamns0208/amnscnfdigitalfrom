@@ -97,6 +97,7 @@
             padding: 12px;
             border: 1px solid var(--border-color);
             border-radius: 4px;
+            flex-wrap: wrap;
         }
 
         .checkbox-item {
@@ -171,7 +172,7 @@
     </div>
 
     <form id="confinedEntryForm">
-        <!-- Area, Department & Work Permit No -->
+        <!-- Area Category & Department -->
         <div class="row">
             <div class="form-group">
                 <label for="area">Area Category *</label>
@@ -186,18 +187,35 @@
                 <label for="department">Department *</label>
                 <select id="department" required onchange="generateCertNumbers()">
                     <option value="">Select Department</option>
-                    <option value="CGL_MECH">CGL Mech</option>
-                    <option value="CGL_PROD">CGL Prod</option>
-                    <option value="CGL_ELEC">CGL Elec</option>
-                    <option value="CRM_MECH">CRM Mech</option>
-                    <option value="CRM_PROD">CRM Prod</option>
-                    <option value="CRM_ELEC">CRM Elec</option>
-                    <option value="ARP">ARP</option>
-                    <option value="PICKLING">Pickling</option>
+                    <optgroup label="CGL">
+                        <option value="CGL_MECH">CGL - Mechanical</option>
+                        <option value="CGL_ELEC">CGL - Electrical</option>
+                        <option value="CGL_PROD">CGL - Production</option>
+                    </optgroup>
+                    <optgroup label="CCL">
+                        <option value="CCL_MECH">CCL - Mechanical</option>
+                        <option value="CCL_ELEC">CCL - Electrical</option>
+                        <option value="CCL_PROD">CCL - Production</option>
+                    </optgroup>
+                    <optgroup label="CRM">
+                        <option value="CRM_MECH">CRM - Mechanical</option>
+                        <option value="CRM_ELEC">CRM - Electrical</option>
+                        <option value="CRM_PROD">CRM - Production</option>
+                    </optgroup>
+                    <optgroup label="UTILITY">
+                        <option value="UTILITY_MECH">UTILITY - Mechanical</option>
+                        <option value="UTILITY_ELEC">UTILITY - Electrical</option>
+                        <option value="UTILITY_PROD">UTILITY - Production</option>
+                    </optgroup>
+                    <optgroup label="GENERAL">
+                        <option value="ADMIN">ADMIN</option>
+                        <option value="CIVIL">CIVIL</option>
+                    </optgroup>
                 </select>
             </div>
         </div>
 
+        <!-- Work Permit No & Confined Space Certificate No -->
         <div class="row">
             <div class="form-group">
                 <label for="workPermitNo">Work Permit No. *</label>
@@ -211,7 +229,7 @@
             </div>
         </div>
 
-        <!-- Checkboxes for Associated Permits -->
+        <!-- Associated Permits -->
         <div class="form-group">
             <label>Associated Hazards & Work Types *</label>
             <div class="checkbox-group">
@@ -245,7 +263,7 @@
             <textarea id="workDescription" rows="3" required placeholder="Describe the job to be performed..."></textarea>
         </div>
 
-        <!-- Entrants Dynamic Rows -->
+        <!-- Entrants Count & Dynamic Rows -->
         <div class="form-group">
             <label for="noOfEntrants">Number of Entrants *</label>
             <input type="number" id="noOfEntrants" min="1" max="60" required placeholder="Enter count of entrants" onchange="generateEntrantRows()">
@@ -263,7 +281,7 @@
                 <tbody id="entrantsTableBody">
                     <tr>
                         <td>1</td>
-                        <td><input type="text" class="entrant-input" required placeholder="e.g. John Doe (EMP12345)"></td>
+                        <td><input type="text" class="entrant-input" required placeholder="e.g. Rahul Kumawat (EMP12345)"></td>
                     </tr>
                 </tbody>
             </table>
@@ -293,7 +311,7 @@
 </div>
 
 <script>
-    // Power Automate Webhook Endpoint URL
+    // Replace with your active Power Automate HTTP Post Endpoint URL
     const WEBHOOK_URL = "https://default37cd273a1cec4aaea29741480ea54f.8d.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/62e0ced429bc4b2aa03c672bf333334b/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=hj17r1Zp5o87SzxxGK_CULg0KQFwE8MSEzOiGxYcvJo";
 
     // Dynamic Certificate Number Generator
@@ -346,7 +364,7 @@
         submitBtn.innerText = "Submitting Entry Data...";
         statusMsg.style.display = "none";
 
-        // Collect all entrant details into an array
+        // Collect entrant inputs
         const entrantInputs = document.querySelectorAll(".entrant-input");
         const entrantsList = [];
         entrantInputs.forEach((input, index) => {
@@ -355,7 +373,7 @@
             }
         });
 
-        // Construct JSON Payload
+        // JSON Payload Construction
         const payload = {
             WorkPermitNo: document.getElementById("workPermitNo").value,
             ConfinedSpaceCertNo: document.getElementById("confCertNo").value,
@@ -382,23 +400,23 @@
 
             if (response.ok || response.status === 202) {
                 statusMsg.className = "status-message success";
-                statusMsg.innerText = "Entry registered successfully! Email sent to Department HOD & Chairman.";
+                statusMsg.innerText = "Entry registered successfully! Notification sent to Department HOD & Chairman.";
                 document.getElementById("confinedEntryForm").reset();
                 document.getElementById("entrantsTableBody").innerHTML = `
                     <tr>
                         <td>1</td>
-                        <td><input type="text" class="entrant-input" required placeholder="e.g. John Doe (EMP12345)"></td>
+                        <td><input type="text" class="entrant-input" required placeholder="e.g. Rahul Kumawat (EMP12345)"></td>
                     </tr>`;
             } else {
                 const errText = await response.text();
                 console.error("HTTP Response Error:", response.status, errText);
                 statusMsg.className = "status-message error";
-                statusMsg.innerText = `Submission failed (${response.status}). Check browser console.`;
+                statusMsg.innerText = `Submission failed (${response.status}).`;
             }
         } catch (err) {
             console.error("Network Error:", err);
             statusMsg.className = "status-message error";
-            statusMsg.innerText = "Network Error! Could not reach Power Automate endpoint.";
+            statusMsg.innerText = "Network Error! Power Automate endpoint unreachable.";
         } finally {
             submitBtn.disabled = false;
             submitBtn.innerText = "Enter in Confined Space";
