@@ -518,7 +518,7 @@
         const canvas = document.createElement('canvas');
         let width = img.width;
         let height = img.height;
-        const maxDim = 400;
+        const maxDim = 300; // Resizes image dimensions to avoid massive payloads
 
         if (width > height) {
           if (width > maxDim) { height *= maxDim / width; width = maxDim; }
@@ -531,7 +531,7 @@
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, width, height);
         
-        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.3);
+        const compressedBase64 = canvas.toDataURL('image/jpeg', 0.2);
         callback(compressedBase64);
       };
       img.src = e.target.result;
@@ -567,8 +567,8 @@
     }
   }
 
-  // HTTP WEBHOOK ENDPOINT (Paste full copied URL from Power Automate inside quotes below)
-  const webhookUrl = 'YOUR_FULL_POWER_AUTOMATE_URL_HERE';
+  // FULL POWER AUTOMATE URL WITH SECURITY SIGNATURE INCLUDED
+  const webhookUrl = "https://default37cd273a1cec4aaea29741480ea54f.8d.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/62e0ced429bc4b2aa03c672bf333334b/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=hj17r1Zp5o87SzxxGK_CULg0KQFwE8MSEzOiGxYcvJo";
 
   function isNumericOnly(val) {
     return /^[0-9]+$/.test(String(val).trim());
@@ -603,7 +603,7 @@
       return;
     }
 
-    if(!deptSelect) { alert("⚠️ Mandatory Field Missing: Please select Executing Department."); return; }
+    if(!deptSelect) { alert("⚠️ Mandatory Field Missing: Select Executing Department."); return; }
     if(!equipment || !workDesc) { alert("⚠️ Mandatory Fields Missing: Fill Equipment and Work Description."); return; }
     if(entrantsList.length === 0 || !attendantName || !supervisorName || !rescuerName) { alert("⚠️ Mandatory Personnel Missing: Fill Entrants, Attendant, Supervisor, and Rescuer."); return; }
 
@@ -611,7 +611,6 @@
     btnText.innerHTML = '⏳ Processing Registration...';
 
     const areaClass = document.querySelector('input[name="areaClassification"]:checked').value;
-
     const prePhotoStr = preEntrantPhotoBase64 ? preEntrantPhotoBase64 : "No Photo Uploaded";
     const tbtPhotoStr = tbtPhotoBase64 ? tbtPhotoBase64 : "No Photo Uploaded";
 
@@ -637,38 +636,33 @@
       exitPhoto: ""
     };
 
-    const completeSubmissionUI = () => {
-      clearDraftData();
-      document.getElementById('formSection').style.display = 'none';
-      document.getElementById('displayHeadcount').innerText = headcount;
-      document.getElementById('exitHeadcount').value = headcount;
-      document.getElementById('successScreen').style.display = 'block';
-      document.getElementById('permStatus').innerText = '2. ACTIVE WORK IN PROGRESS';
-      document.getElementById('permStatus').className = 'status-badge active';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
-    if (!webhookUrl || webhookUrl === 'YOUR_FULL_POWER_AUTOMATE_URL_HERE') {
-      completeSubmissionUI();
-      return;
-    }
-
     try {
       const response = await fetch(webhookUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        mode: 'cors',
+        headers: { 
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify(payload)
       });
 
       if (response.ok || response.status === 202 || response.status === 200) {
-        completeSubmissionUI();
+        clearDraftData();
+        document.getElementById('formSection').style.display = 'none';
+        document.getElementById('displayHeadcount').innerText = headcount;
+        document.getElementById('exitHeadcount').value = headcount;
+        document.getElementById('successScreen').style.display = 'block';
+        document.getElementById('permStatus').innerText = '2. ACTIVE WORK IN PROGRESS';
+        document.getElementById('permStatus').className = 'status-badge active';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
-        alert("⚠️ Server Error (" + response.status + "). Please check backend integration.");
+        const errText = await response.text();
+        alert(`❌ Server Error (${response.status}): ${errText}`);
         btn.disabled = false;
         btnText.innerHTML = '🚪 STEP 1: START WORK & ENTER CONFINED SPACE';
       }
     } catch(err) {
-      alert("❌ Connection Error: Unable to reach server.");
+      alert(`❌ Network Failure: ${err.message}`);
       btn.disabled = false;
       btnText.innerHTML = '🚪 STEP 1: START WORK & ENTER CONFINED SPACE';
     }
@@ -706,35 +700,30 @@
       exitPhoto: String(exitPhotoStr)
     };
 
-    const finishExitUI = () => {
-      clearDraftData();
-      document.getElementById('phase2Container').innerHTML = "<div class='success-screen' style='display:block;'><div style='font-size:50px;'>🎉</div><div class='success-title' style='color:#16a34a;'>PERMIT CLOSED SUCCESSFULLY</div><p style='color:#334155;'>Total Exited Headcount: " + exitHeadcount + " | Attendance Verified & Closed.</p></div>";
-      document.getElementById('permStatus').innerText = '3. PERMIT CLOSED';
-      document.getElementById('permStatus').className = 'status-badge closed';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
-    if (!webhookUrl || webhookUrl === 'YOUR_FULL_POWER_AUTOMATE_URL_HERE') {
-      finishExitUI();
-      return;
-    }
-
     try {
       const response = await fetch(webhookUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        mode: 'cors',
+        headers: { 
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify(payload)
       });
 
       if (response.ok || response.status === 202 || response.status === 200) {
-        finishExitUI();
+        clearDraftData();
+        document.getElementById('phase2Container').innerHTML = "<div class='success-screen' style='display:block;'><div style='font-size:50px;'>🎉</div><div class='success-title' style='color:#16a34a;'>PERMIT CLOSED SUCCESSFULLY</div><p style='color:#334155;'>Total Exited Headcount: " + exitHeadcount + " | Attendance Verified & Closed.</p></div>";
+        document.getElementById('permStatus').innerText = '3. PERMIT CLOSED';
+        document.getElementById('permStatus').className = 'status-badge closed';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
-        alert("⚠️ Server Error (" + response.status + "). Please check backend integration.");
+        const errText = await response.text();const webhookUrl
+        alert(`❌ Server Error (${response.status}): ${errText}`);
         btn.disabled = false;
         btnText.innerHTML = '✅ STEP 2: COMPLETE WORK & CLOSE PERMIT';
       }
     } catch(err) {
-      alert("❌ Connection Error during exit sign-out.");
+      alert(`❌ Network Failure: ${err.message}`);
       btn.disabled = false;
       btnText.innerHTML = '✅ STEP 2: COMPLETE WORK & CLOSE PERMIT';
     }
