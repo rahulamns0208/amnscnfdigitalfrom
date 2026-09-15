@@ -13,11 +13,11 @@
             --card-bg: #ffffff;
             --text-color: #333333;
             --border-color: #cccccc;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
         }
 
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -28,301 +28,108 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* Full Screen Password Protection Modal */
         #authOverlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(0, 0, 0, 0.85);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            padding: 16px;
+            display: flex; justify-content: center; align-items: center;
+            z-index: 9999; padding: 16px;
         }
 
         .auth-card {
-            background: #ffffff;
-            padding: 24px 20px;
-            border-radius: 8px;
-            width: 100%;
-            max-width: 380px;
-            text-align: center;
+            background: #ffffff; padding: 24px 20px; border-radius: 8px;
+            width: 100%; max-width: 380px; text-align: center;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
-        .auth-card h3 {
-            margin-top: 0;
-            color: var(--primary-color);
-            font-size: 18px;
-            margin-bottom: 8px;
-        }
-
-        .auth-card p {
-            font-size: 13px;
-            color: #666;
-            margin-bottom: 16px;
-        }
-
-        .auth-card input {
-            margin-bottom: 12px;
-            text-align: center;
-            font-size: 16px;
-            letter-spacing: 1px;
-        }
-
-        .auth-error {
-            color: #d9534f;
-            font-size: 12px;
-            margin-top: 8px;
-            display: none;
-            font-weight: bold;
-        }
+        .auth-card h3 { margin-top: 0; color: var(--primary-color); font-size: 18px; }
+        .auth-card input { margin-bottom: 12px; text-align: center; font-size: 16px; width: 100%; padding: 10px; }
+        .auth-error { color: #d9534f; font-size: 12px; display: none; font-weight: bold; }
 
         .container {
-            max-width: 850px;
-            margin: 0 auto;
-            background: var(--card-bg);
-            padding: 16px 12px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-            display: none; /* Hidden until authorized */
+            max-width: 850px; margin: 0 auto;
+            background: var(--card-bg); padding: 16px 12px;
+            border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+            display: none;
         }
 
-        /* Mobile-Optimized Scaling Header */
         .header {
-            text-align: center;
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 10px;
-            margin-bottom: 16px;
+            text-align: center; border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px; margin-bottom: 16px;
         }
 
-        .header h1 {
-            color: var(--primary-color);
-            margin: 0;
-            font-size: 16px;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-            line-height: 1.2;
+        .header h1 { color: var(--primary-color); margin: 0; font-size: 18px; text-transform: uppercase; }
+        .header h2 { color: var(--secondary-color); margin: 4px 0 0 0; font-size: 13px; font-weight: 500; }
+
+        .form-group { margin-bottom: 14px; }
+        label { display: block; font-weight: 600; margin-bottom: 5px; color: var(--secondary-color); font-size: 13px; }
+
+        .row { display: flex; flex-direction: column; gap: 0; }
+
+        input[type="text"], input[type="number"], input[type="password"], select, textarea {
+            width: 100%; padding: 10px 12px; border: 1px solid var(--border-color);
+            border-radius: 6px; font-size: 15px; background-color: #fff;
         }
 
-        .header h2 {
-            color: var(--secondary-color);
-            margin: 4px 0 0 0;
-            font-size: 12px;
-            font-weight: 500;
-            line-height: 1.3;
-        }
-
-        .form-group {
-            margin-bottom: 14px;
-        }
-
-        label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 5px;
-            color: var(--secondary-color);
-            font-size: 13px;
-        }
-
-        .row {
-            display: flex;
-            flex-direction: column;
-            gap: 0;
-        }
-
-        input[type="text"],
-        input[type="number"],
-        input[type="password"],
-        select,
-        textarea {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 15px;
-            background-color: #fff;
-        }
-
-        /* Clean Dropdown Arrow CSS for Standard Dropdowns */
-        select {
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23333333%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
-            background-repeat: no-repeat;
-            background-position: right 12px center;
-            background-size: 10px auto;
-            padding-right: 30px !important;
-        }
-
-        select::-ms-expand {
-            display: none;
-        }
-
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(200, 16, 46, 0.15);
-        }
-
-        /* Clean Modern Toggle Chips for Hazards Box */
         .checkbox-group {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            background: #f8f9fa;
-            padding: 14px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
+            display: flex; flex-direction: column; gap: 12px;
+            background: #f8f9fa; padding: 14px; border: 1px solid var(--border-color); border-radius: 6px;
         }
 
-        .checkbox-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 600;
-            font-size: 13px;
-        }
+        .checkbox-item { display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 13px; }
 
-        .toggle-switch {
-            display: flex;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            overflow: hidden;
-            background-color: #ffffff;
-        }
-
-        .toggle-switch input[type="radio"] {
-            display: none;
-        }
-
+        .toggle-switch { display: flex; border: 1px solid var(--border-color); border-radius: 6px; overflow: hidden; }
+        .toggle-switch input[type="radio"] { display: none; }
         .toggle-switch label {
-            padding: 6px 14px;
-            margin: 0;
-            font-size: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            background-color: #ffffff;
-            color: #555555;
-            transition: all 0.2s ease;
-            user-select: none;
+            padding: 6px 14px; margin: 0; font-size: 12px; font-weight: bold;
+            cursor: pointer; background-color: #ffffff; color: #555555;
         }
+        .toggle-switch input[type="radio"]:checked + label { background-color: var(--primary-color); color: #ffffff; }
 
-        .toggle-switch input[type="radio"]:checked + label {
-            background-color: var(--primary-color);
-            color: #ffffff;
-        }
-
-        .entrants-wrapper {
-            width: 100%;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .entrants-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 6px;
-            min-width: 280px;
-        }
-
-        .entrants-table th, .entrants-table td {
-            border: 1px solid var(--border-color);
-            padding: 6px 8px;
-            text-align: left;
-        }
-
-        .entrants-table th {
-            background-color: #f1f1f1;
-            font-size: 12px;
-        }
+        .entrants-table { width: 100%; border-collapse: collapse; margin-top: 6px; }
+        .entrants-table th, .entrants-table td { border: 1px solid var(--border-color); padding: 6px 8px; text-align: left; }
+        .entrants-table th { background-color: #f1f1f1; font-size: 12px; }
 
         .btn-submit {
-            background-color: var(--primary-color);
-            color: #ffffff;
-            border: none;
-            padding: 14px;
-            font-size: 15px;
-            font-weight: bold;
-            border-radius: 6px;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 10px;
-            transition: background 0.2s ease;
-            touch-action: manipulation;
+            background-color: var(--primary-color); color: #ffffff; border: none;
+            padding: 14px; font-size: 15px; font-weight: bold; border-radius: 6px;
+            cursor: pointer; width: 100%; margin-top: 10px;
         }
 
-        .btn-submit:active {
-            background-color: var(--primary-hover);
-        }
+        .btn-complete { background-color: var(--success-color); }
 
         .status-message {
-            margin-top: 12px;
-            padding: 10px;
-            border-radius: 6px;
-            display: none;
-            text-align: center;
-            font-size: 13px;
-            font-weight: bold;
+            margin-top: 12px; padding: 10px; border-radius: 6px; display: none;
+            text-align: center; font-size: 13px; font-weight: bold;
+        }
+        .status-message.success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .status-message.error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+        /* Work In Progress / Exit Portal Styles */
+        .wip-badge {
+            background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba;
+            padding: 10px; border-radius: 6px; text-align: center; font-weight: bold;
+            margin-bottom: 16px; font-size: 14px;
         }
 
-        .status-message.success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+        .summary-card {
+            background: #f8f9fa; border: 1px solid var(--border-color);
+            border-radius: 6px; padding: 12px; margin-bottom: 16px; font-size: 13px;
         }
 
-        .status-message.error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
+        .summary-card p { margin: 6px 0; }
 
         @media (min-width: 600px) {
-            body {
-                padding: 20px;
-            }
-
-            .container {
-                padding: 30px;
-            }
-
-            .header h1 {
-                font-size: 22px;
-            }
-
-            .header h2 {
-                font-size: 15px;
-            }
-
-            .row {
-                flex-direction: row;
-                gap: 15px;
-            }
-
-            .row .form-group {
-                flex: 1;
-            }
-
-            .checkbox-group {
-                flex-direction: row;
-                justify-content: space-between;
-            }
-
-            .checkbox-item {
-                flex-direction: row;
-                gap: 10px;
-            }
+            body { padding: 20px; }
+            .container { padding: 30px; }
+            .row { flex-direction: row; gap: 15px; }
+            .row .form-group { flex: 1; }
+            .checkbox-group { flex-direction: row; justify-content: space-between; }
         }
     </style>
 </head>
 <body>
 
-<!-- Security Authentication Screen -->
 <div id="authOverlay">
     <div class="auth-card">
         <h3>AM/NS INDIA</h3>
@@ -333,156 +140,190 @@
     </div>
 </div>
 
-<!-- Main Application Form -->
 <div class="container" id="mainContent">
     <div class="header">
         <h1>AM/NS INDIA</h1>
         <h2>Confined Space & Gas Hazard Area Entry Portal</h2>
     </div>
 
-    <form id="confinedEntryForm">
-        <!-- Area Category & Department -->
-        <div class="row">
-            <div class="form-group">
-                <label for="area">Area Category *</label>
-                <select id="area" required onchange="generateCertNumbers()">
-                    <option value="">Select Area</option>
-                    <option value="NGHA">Confined Space (NGHA)</option>
-                    <option value="GHA">Confined Space (GHA)</option>
-                    <option value="GAS_HAZARD">Gas Hazard Area</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="department">Department *</label>
-                <select id="department" required onchange="generateCertNumbers()">
-                    <option value="">Select Department</option>
-                    <optgroup label="CGL">
-                        <option value="CGL_MECH">CGL - Mechanical</option>
-                        <option value="CGL_ELEC">CGL - Electrical</option>
-                        <option value="CGL_PROD">CGL - Production</option>
-                    </optgroup>
-                    <optgroup label="CCL">
-                        <option value="CCL_MECH">CCL - Mechanical</option>
-                        <option value="CCL_ELEC">CCL - Electrical</option>
-                        <option value="CCL_PROD">CCL - Production</option>
-                    </optgroup>
-                    <optgroup label="CRM">
-                        <option value="CRM_MECH">CRM - Mechanical</option>
-                        <option value="CRM_ELEC">CRM - Electrical</option>
-                        <option value="CRM_PROD">CRM - Production</option>
-                    </optgroup>
-                    <optgroup label="UTILITY">
-                        <option value="UTILITY_MECH">UTILITY - Mechanical</option>
-                        <option value="UTILITY_ELEC">UTILITY - Electrical</option>
-                        <option value="UTILITY_PROD">UTILITY - Production</option>
-                    </optgroup>
-                    <optgroup label="GENERAL">
-                        <option value="ADMIN">ADMIN</option>
-                        <option value="CIVIL">CIVIL</option>
-                    </optgroup>
-                </select>
-            </div>
-        </div>
-
-        <!-- Work Permit No & Confined Space Certificate No -->
-        <div class="row">
-            <div class="form-group">
-                <label for="workPermitNo">Work Permit No. *</label>
-                <input type="text" id="workPermitNo" required placeholder="Enter Work Permit Number">
-            </div>
-            <div class="form-group">
-                <label for="confCertNo">Confined Space Certificate No. *</label>
-                <select id="confCertNo" required>
-                    <option value="">Select Area & Dept First</option>
-                </select>
-            </div>
-        </div>
-
-        <!-- Associated Permits -->
-        <div class="form-group">
-            <label>Associated Hazards & Work Types *</label>
-            <div class="checkbox-group">
-                <div class="checkbox-item">
-                    <span>Work at Height:</span>
-                    <div class="toggle-switch">
-                        <input type="radio" id="heightNo" name="workAtHeight" value="NO" checked>
-                        <label for="heightNo">NO</label>
-                        <input type="radio" id="heightYes" name="workAtHeight" value="YES">
-                        <label for="heightYes">YES</label>
-                    </div>
+    <!-- ENTRY FORM VIEW -->
+    <div id="entryFormView">
+        <form id="confinedEntryForm">
+            <div class="row">
+                <div class="form-group">
+                    <label for="area">Area Category *</label>
+                    <select id="area" required onchange="generateCertNumbers()">
+                        <option value="">Select Area</option>
+                        <option value="NGHA">Confined Space (NGHA)</option>
+                        <option value="GHA">Confined Space (GHA)</option>
+                        <option value="GAS_HAZARD">Gas Hazard Area</option>
+                    </select>
                 </div>
-                <div class="checkbox-item">
-                    <span>Electrical Work:</span>
-                    <div class="toggle-switch">
-                        <input type="radio" id="elecNo" name="electricalWork" value="NO" checked>
-                        <label for="elecNo">NO</label>
-                        <input type="radio" id="elecYes" name="electricalWork" value="YES">
-                        <label for="elecYes">YES</label>
-                    </div>
+                <div class="form-group">
+                    <label for="department">Department *</label>
+                    <select id="department" required onchange="generateCertNumbers()">
+                        <option value="">Select Department</option>
+                        <optgroup label="CGL">
+                            <option value="CGL_MECH">CGL - Mechanical</option>
+                            <option value="CGL_ELEC">CGL - Electrical</option>
+                            <option value="CGL_PROD">CGL - Production</option>
+                        </optgroup>
+                        <optgroup label="CCL">
+                            <option value="CCL_MECH">CCL - Mechanical</option>
+                            <option value="CCL_ELEC">CCL - Electrical</option>
+                            <option value="CCL_PROD">CCL - Production</option>
+                        </optgroup>
+                        <optgroup label="CRM">
+                            <option value="CRM_MECH">CRM - Mechanical</option>
+                            <option value="CRM_ELEC">CRM - Electrical</option>
+                            <option value="CRM_PROD">CRM - Production</option>
+                        </optgroup>
+                        <optgroup label="UTILITY">
+                            <option value="UTILITY_MECH">UTILITY - Mechanical</option>
+                            <option value="UTILITY_ELEC">UTILITY - Electrical</option>
+                            <option value="UTILITY_PROD">UTILITY - Production</option>
+                        </optgroup>
+                    </select>
                 </div>
-                <div class="checkbox-item">
-                    <span>Welding / Cutting:</span>
-                    <div class="toggle-switch">
-                        <input type="radio" id="weldNo" name="weldingWork" value="NO" checked>
-                        <label for="weldNo">NO</label>
-                        <input type="radio" id="weldYes" name="weldingWork" value="YES">
-                        <label for="weldYes">YES</label>
+            </div>
+
+            <div class="row">
+                <div class="form-group">
+                    <label for="workPermitNo">Work Permit No. *</label>
+                    <input type="text" id="workPermitNo" required placeholder="Enter Work Permit Number">
+                </div>
+                <div class="form-group">
+                    <label for="confCertNo">Confined Space Certificate No. *</label>
+                    <select id="confCertNo" required>
+                        <option value="">Select Area & Dept First</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Associated Hazards & Work Types *</label>
+                <div class="checkbox-group">
+                    <div class="checkbox-item">
+                        <span>Work at Height:</span>
+                        <div class="toggle-switch">
+                            <input type="radio" id="heightNo" name="workAtHeight" value="NO" checked>
+                            <label for="heightNo">NO</label>
+                            <input type="radio" id="heightYes" name="workAtHeight" value="YES">
+                            <label for="heightYes">YES</label>
+                        </div>
+                    </div>
+                    <div class="checkbox-item">
+                        <span>Electrical Work:</span>
+                        <div class="toggle-switch">
+                            <input type="radio" id="elecNo" name="electricalWork" value="NO" checked>
+                            <label for="elecNo">NO</label>
+                            <input type="radio" id="elecYes" name="electricalWork" value="YES">
+                            <label for="elecYes">YES</label>
+                        </div>
+                    </div>
+                    <div class="checkbox-item">
+                        <span>Welding / Cutting:</span>
+                        <div class="toggle-switch">
+                            <input type="radio" id="weldNo" name="weldingWork" value="NO" checked>
+                            <label for="weldNo">NO</label>
+                            <input type="radio" id="weldYes" name="weldingWork" value="YES">
+                            <label for="weldYes">YES</label>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <div class="form-group">
+                <label for="workDescription">Work Description *</label>
+                <textarea id="workDescription" rows="3" required placeholder="Describe the job to be performed..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="noOfEntrants">Number of Entrants *</label>
+                <input type="number" id="noOfEntrants" min="1" max="60" required placeholder="Enter count of entrants" onchange="generateEntrantRows()">
+            </div>
+
+            <div class="form-group">
+                <label>Name OR Employee ID of Entrants</label>
+                <div class="entrants-wrapper">
+                    <table class="entrants-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 12%;">#</th>
+                                <th>Entrant Name OR Employee ID</th>
+                            </tr>
+                        </thead>
+                        <tbody id="entrantsTableBody">
+                            <tr>
+                                <td>1</td>
+                                <td><input type="text" class="entrant-input" required placeholder="Enter Name OR Employee ID"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="form-group">
+                    <label for="attendantName">Name OR Employee ID of Attendant *</label>
+                    <input type="text" id="attendantName" required placeholder="Attendant Name OR Employee ID">
+                </div>
+                <div class="form-group">
+                    <label for="supervisorName">Name OR Employee ID of Supervisor *</label>
+                    <input type="text" id="supervisorName" required placeholder="Supervisor Name OR Employee ID">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="rescuePersonName">Name OR Employee ID of Rescue Person *</label>
+                <input type="text" id="rescuePersonName" required placeholder="Rescue Person Name OR Employee ID">
+            </div>
+
+            <button type="submit" class="btn-submit" id="submitBtn">Enter in Confined Space</button>
+        </form>
+    </div>
+
+    <!-- WORK IN PROGRESS / EXIT VIEW -->
+    <div id="wipView" style="display: none;">
+        <div class="wip-badge">⚠️ WORK IN PROGRESS - CONFINED SPACE OCCUPIED</div>
+        
+        <div class="summary-card">
+            <p><strong>Permit No:</strong> <span id="wipPermitNo"></span></p>
+            <p><strong>Certificate No:</strong> <span id="wipCertNo"></span></p>
+            <p><strong>Department / Area:</strong> <span id="wipDeptArea"></span></p>
+            <p><strong>Entry Time:</strong> <span id="wipEntryTime"></span></p>
+            <p><strong>Attendant:</strong> <span id="wipAttendant"></span></p>
+            <p><strong>Supervisor:</strong> <span id="wipSupervisor"></span></p>
+            <p><strong>Rescue Person:</strong> <span id="wipRescue"></span></p>
         </div>
 
-        <!-- Work Description -->
-        <div class="form-group">
-            <label for="workDescription">Work Description *</label>
-            <textarea id="workDescription" rows="3" required placeholder="Describe the job to be performed..."></textarea>
-        </div>
-
-        <!-- Entrants Count & Dynamic Table -->
-        <div class="form-group">
-            <label for="noOfEntrants">Number of Entrants *</label>
-            <input type="number" id="noOfEntrants" min="1" max="60" required placeholder="Enter count of entrants" onchange="generateEntrantRows()">
-        </div>
-
-        <div class="form-group">
-            <label>Name or Employee ID of Entrants</label>
-            <div class="entrants-wrapper">
-                <table class="entrants-table" id="entrantsTable">
+        <form id="exitForm">
+            <div class="form-group">
+                <label>Verification of Headcount (Check all entrants who have safely exited):</label>
+                <table class="entrants-table">
                     <thead>
                         <tr>
-                            <th style="width: 12%;">#</th>
-                            <th>Entrant Name or Employee ID</th>
+                            <th style="width: 10%;">Safe</th>
+                            <th>Entrant Details</th>
                         </tr>
                     </thead>
-                    <tbody id="entrantsTableBody">
-                        <tr>
-                            <td>1</td>
-                            <td><input type="text" class="entrant-input" required placeholder="Enter Name or Employee ID"></td>
-                        </tr>
-                    </tbody>
+                    <tbody id="exitEntrantsTableBody"></tbody>
                 </table>
             </div>
-        </div>
 
-        <!-- Personnel Details -->
-        <div class="row">
             <div class="form-group">
-                <label for="attendantName">Name or Employee ID of Attendant *</label>
-                <input type="text" id="attendantName" required placeholder="Attendant Name or Employee ID">
+                <label for="exitedHeadcount">Total Exited Headcount *</label>
+                <input type="number" id="exitedHeadcount" required placeholder="Confirm exited headcount" readonly>
             </div>
+
             <div class="form-group">
-                <label for="supervisorName">Name or Employee ID of Supervisor *</label>
-                <input type="text" id="supervisorName" required placeholder="Supervisor Name or Employee ID">
+                <label for="exitRemarks">Completion Remarks *</label>
+                <textarea id="exitRemarks" rows="2" required placeholder="E.g., Work completed, space cleared, house-keeping done..."></textarea>
             </div>
-        </div>
 
-        <div class="form-group">
-            <label for="rescuePersonName">Name or Employee ID of Rescue Person *</label>
-            <input type="text" id="rescuePersonName" required placeholder="Rescue Person Name or Employee ID">
-        </div>
-
-        <button type="submit" class="btn-submit" id="submitBtn">Enter in Confined Space</button>
-    </form>
+            <button type="submit" class="btn-submit btn-complete" id="exitSubmitBtn">Complete Work & Register Exit</button>
+        </form>
+    </div>
 
     <div id="statusMessage" class="status-message"></div>
 </div>
@@ -493,36 +334,39 @@
 
     function verifyPassword() {
         const inputPass = document.getElementById("accessPassword").value;
-        const authOverlay = document.getElementById("authOverlay");
-        const mainContent = document.getElementById("mainContent");
-        const authError = document.getElementById("authError");
-
         if (inputPass === SECRET_PASS) {
-            authOverlay.style.display = "none";
-            mainContent.style.display = "block";
+            document.getElementById("authOverlay").style.display = "none";
+            document.getElementById("mainContent").style.display = "block";
+            checkActiveSession();
         } else {
-            authError.style.display = "block";
+            document.getElementById("authError").style.display = "block";
             document.getElementById("accessPassword").value = "";
         }
     }
 
     document.getElementById("accessPassword").addEventListener("keypress", function(e) {
-        if (e.key === "Enter") {
-            verifyPassword();
-        }
+        if (e.key === "Enter") verifyPassword();
     });
+
+    function checkActiveSession() {
+        const activePermit = localStorage.getItem("AMNS_ACTIVE_PERMIT");
+        if (activePermit) {
+            const data = JSON.parse(activePermit);
+            renderWIPScreen(data);
+        } else {
+            document.getElementById("entryFormView").style.display = "block";
+            document.getElementById("wipView").style.display = "none";
+        }
+    }
 
     function generateCertNumbers() {
         const area = document.getElementById("area").value;
         const dept = document.getElementById("department").value;
         const certDropdown = document.getElementById("confCertNo");
-
         certDropdown.innerHTML = '<option value="">Select Certificate Number</option>';
-
         if (!area || !dept) return;
 
         let formattedDept = dept.replace("_", "/");
-
         for (let i = 1; i <= 60; i++) {
             let certNum = `AMNS/${formattedDept}/CNF/${i}/${area}`;
             let option = document.createElement("option");
@@ -536,28 +380,26 @@
         const count = parseInt(document.getElementById("noOfEntrants").value, 10) || 0;
         const tbody = document.getElementById("entrantsTableBody");
         tbody.innerHTML = "";
-
         if (count < 1) return;
 
         for (let i = 1; i <= count; i++) {
             const tr = document.createElement("tr");
             tr.innerHTML = `
                 <td>${i}</td>
-                <td><input type="text" class="entrant-input" required placeholder="Entrant ${i} Name or Employee ID"></td>
+                <td><input type="text" class="entrant-input" required placeholder="Entrant ${i} Name OR Employee ID"></td>
             `;
             tbody.appendChild(tr);
         }
     }
 
+    /* HANDLE ENTRY SUBMISSION */
     document.getElementById("confinedEntryForm").addEventListener("submit", async function(e) {
         e.preventDefault();
 
         const submitBtn = document.getElementById("submitBtn");
         const statusMsg = document.getElementById("statusMessage");
-
         submitBtn.disabled = true;
-        submitBtn.innerText = "Submitting...";
-        statusMsg.style.display = "none";
+        submitBtn.innerText = "Submitting Entry...";
 
         const entrantInputs = document.querySelectorAll(".entrant-input");
         const entrantsList = [];
@@ -568,6 +410,7 @@
         });
 
         const payload = {
+            Action: "ENTRY",
             WorkPermitNo: document.getElementById("workPermitNo").value,
             ConfinedSpaceCertNo: document.getElementById("confCertNo").value,
             WorkAtHeight: document.querySelector('input[name="workAtHeight"]:checked').value,
@@ -592,25 +435,119 @@
             });
 
             if (response.ok || response.status === 202) {
-                statusMsg.className = "status-message success";
-                statusMsg.innerText = "Entry registered successfully!";
+                // Save session in localStorage so it stays active on refresh/navigation
+                localStorage.setItem("AMNS_ACTIVE_PERMIT", JSON.stringify(payload));
                 document.getElementById("confinedEntryForm").reset();
-                document.getElementById("entrantsTableBody").innerHTML = `
-                    <tr>
-                        <td>1</td>
-                        <td><input type="text" class="entrant-input" required placeholder="Enter Name or Employee ID"></td>
-                    </tr>`;
+                checkActiveSession();
             } else {
                 statusMsg.className = "status-message error";
                 statusMsg.innerText = `Submission failed (${response.status}).`;
+                statusMsg.style.display = "block";
             }
         } catch (err) {
             statusMsg.className = "status-message error";
             statusMsg.innerText = "Network Error! Power Automate endpoint unreachable.";
+            statusMsg.style.display = "block";
         } finally {
             submitBtn.disabled = false;
             submitBtn.innerText = "Enter in Confined Space";
+        }
+    });
+
+    /* RENDER WIP & EXIT DASHBOARD */
+    function renderWIPScreen(data) {
+        document.getElementById("entryFormView").style.display = "none";
+        document.getElementById("wipView").style.display = "block";
+
+        document.getElementById("wipPermitNo").innerText = data.WorkPermitNo;
+        document.getElementById("wipCertNo").innerText = data.ConfinedSpaceCertNo;
+        document.getElementById("wipDeptArea").innerText = `${data.Department} / ${data.AreaCategory}`;
+        document.getElementById("wipEntryTime").innerText = data.Timestamp;
+        document.getElementById("wipAttendant").innerText = data.AttendantName;
+        document.getElementById("wipSupervisor").innerText = data.SupervisorName;
+        document.getElementById("wipRescue").innerText = data.RescuePersonName;
+
+        const exitTbody = document.getElementById("exitEntrantsTableBody");
+        exitTbody.innerHTML = "";
+
+        const entrants = data.EntrantsList.split("\n");
+        entrants.forEach((entrant, idx) => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td style="text-align: center;">
+                    <input type="checkbox" class="exit-check" onchange="updateExitCount(${entrants.length})">
+                </td>
+                <td>${entrant}</td>
+            `;
+            exitTbody.appendChild(tr);
+        });
+
+        document.getElementById("exitedHeadcount").value = 0;
+    }
+
+    function updateExitCount(total) {
+        const checked = document.querySelectorAll(".exit-check:checked").length;
+        document.getElementById("exitedHeadcount").value = checked;
+    }
+
+    /* HANDLE EXIT SUBMISSION */
+    document.getElementById("exitForm").addEventListener("submit", async function(e) {
+        e.preventDefault();
+
+        const activeData = JSON.parse(localStorage.getItem("AMNS_ACTIVE_PERMIT"));
+        const totalEntrants = activeData.NoOfEntrants;
+        const verifiedCount = parseInt(document.getElementById("exitedHeadcount").value, 10);
+
+        if (verifiedCount !== totalEntrants) {
+            alert(`Headcount mismatch! All ${totalEntrants} entrants must be verified safe before closing permit.`);
+            return;
+        }
+
+        const exitSubmitBtn = document.getElementById("exitSubmitBtn");
+        const statusMsg = document.getElementById("statusMessage");
+        exitSubmitBtn.disabled = true;
+        exitSubmitBtn.innerText = "Submitting Exit Log...";
+
+        const exitPayload = {
+            Action: "EXIT",
+            WorkPermitNo: activeData.WorkPermitNo,
+            ConfinedSpaceCertNo: activeData.ConfinedSpaceCertNo,
+            Department: activeData.Department,
+            AreaCategory: activeData.AreaCategory,
+            EntrantsList: activeData.EntrantsList,
+            AttendantName: activeData.AttendantName,
+            SupervisorName: activeData.SupervisorName,
+            RescuePersonName: activeData.RescuePersonName,
+            EntryTimestamp: activeData.Timestamp,
+            ExitTimestamp: new Date().toLocaleString(),
+            ExitedHeadcount: verifiedCount,
+            ExitRemarks: document.getElementById("exitRemarks").value
+        };
+
+        try {
+            const response = await fetch(WEBHOOK_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(exitPayload)
+            });
+
+            if (response.ok || response.status === 202) {
+                // Clear active session
+                localStorage.removeItem("AMNS_ACTIVE_PERMIT");
+                alert("Work completed successfully and Exit Log registered!");
+                checkActiveSession();
+            } else {
+                statusMsg.className = "status-message error";
+                statusMsg.innerText = `Exit submission failed (${response.status}).`;
+                statusMsg.style.display = "block";
+            }
+        } catch (err) {
+            statusMsg.className = "status-message error";
+            statusMsg.innerText = "Network Error! Endpoint unreachable.";
             statusMsg.style.display = "block";
+        } finally {
+            exitSubmitBtn.disabled = false;
+            exitSubmitBtn.innerText = "Complete Work & Register Exit";
         }
     });
 </script>
