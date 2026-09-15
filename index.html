@@ -74,7 +74,6 @@
         .btn-secondary { background-color: #6c757d; margin-top: 6px; }
 
         .status-message { margin-top: 12px; padding: 10px; border-radius: 6px; display: none; text-align: center; font-size: 13px; font-weight: bold; }
-        .status-message.error { background-color: #f8d7da; color: #721c24; }
 
         .wip-badge { background-color: #fff3cd; color: #856404; padding: 10px; border-radius: 6px; text-align: center; font-weight: bold; margin-bottom: 16px; }
         .summary-card { background: #f8f9fa; border: 1px solid var(--border-color); border-radius: 6px; padding: 12px; margin-bottom: 16px; font-size: 13px; }
@@ -155,31 +154,26 @@
                     <label for="department">Department *</label>
                     <select id="department" required onchange="generateCertNumbers()">
                         <option value="">Select Department</option>
-                        
                         <optgroup label="CGL">
                             <option value="CGL_MECH">CGL - Mechanical</option>
                             <option value="CGL_ELEC">CGL - Electrical</option>
                             <option value="CGL_PROD">CGL - Production</option>
                         </optgroup>
-
                         <optgroup label="CCL">
                             <option value="CCL_MECH">CCL - Mechanical</option>
                             <option value="CCL_ELEC">CCL - Electrical</option>
                             <option value="CCL_PROD">CCL - Production</option>
                         </optgroup>
-
                         <optgroup label="CRM">
                             <option value="CRM_MECH">CRM - Mechanical</option>
                             <option value="CRM_ELEC">CRM - Electrical</option>
                             <option value="CRM_PROD">CRM - Production</option>
                         </optgroup>
-
                         <optgroup label="UTILITY">
                             <option value="UTILITY_MECH">UTILITY - Mechanical</option>
                             <option value="UTILITY_ELEC">UTILITY - Electrical</option>
                             <option value="UTILITY_PROD">UTILITY - Production</option>
                         </optgroup>
-
                         <optgroup label="GENERAL / MANAGEMENT">
                             <option value="ADMIN">ADMIN</option>
                             <option value="LOGISTICS">LOGISTICS</option>
@@ -301,7 +295,18 @@
         if (document.getElementById("accessPassword").value === SECRET_PASS) {
             document.getElementById("authOverlay").style.display = "none";
             document.getElementById("mainContent").style.display = "block";
-            fetchActivePermitsFromBackend();
+            
+            // Check for locally saved active permit session on load/refresh
+            const savedPermit = localStorage.getItem("AMNS_CURRENT_PERMIT");
+            if (savedPermit) {
+                const permitData = JSON.parse(savedPermit);
+                currentPermitKey = permitData.WorkPermitNo;
+                document.getElementById("permitLookupView").style.display = "none";
+                renderWIPScreen(permitData);
+            } else {
+                fetchActivePermitsFromBackend();
+            }
+
             setInterval(fetchActivePermitsFromBackend, 15000);
         } else {
             document.getElementById("authError").style.display = "block";
@@ -312,7 +317,9 @@
         try {
             const res = await fetch(GOOGLE_SCRIPT_URL);
             if (res.ok) {
-                activePermits = await res.json();
+                const remotePermits = await res.json();
+                // Merge remote active permits with local cache
+                activePermits = Object.assign({}, activePermits, remotePermits);
                 renderActivePermitsList();
             }
         } catch (err) {
@@ -385,6 +392,7 @@
     }
 
     function resetToLookup() {
+        localStorage.removeItem("AMNS_CURRENT_PERMIT");
         document.getElementById("permitLookupView").style.display = "block";
         document.getElementById("entryFormView").style.display = "none";
         document.getElementById("wipView").style.display = "none";
@@ -426,7 +434,8 @@
         if (pin.length !== 4) { alert("PIN must be exactly 4 digits."); return; }
 
         const submitBtn = document.getElementById("submitBtn");
-        submitBtn.disabled = true; submitBtn.innerText = "Submitting Entry...";
+        submitBtn.disabled = true; 
+        submitBtn.innerText = "Submitting Entry...";
 
         const entrantInputs = document.querySelectorAll(".entrant-input");
         const entrantsList = [];
@@ -447,9 +456,18 @@
             AttendantName: document.getElementById("attendantName").value,
             SupervisorName: document.getElementById("supervisorName").value,
             RescuePersonName: document.getElementById("rescuePersonName").value,
+            Status: "ACTIVE",
             Timestamp: new Date().toLocaleString()
         };
 
+        // 1. Instantly store permit state locally
+        activePermits[currentPermitKey] = payload;
+        
+        // 2. Render WIP screen immediately so user never sees a blank screen or disappearance
+        document.getElementById("confinedEntryForm").reset();
+        renderWIPScreen(payload);
+
+        // 3. Post to Google Sheets in the background
         try {
             await fetch(GOOGLE_SCRIPT_URL, {
                 method: "POST",
@@ -457,17 +475,20 @@
                 headers: { "Content-Type": "text/plain" },
                 body: JSON.stringify(payload)
             });
-
-            document.getElementById("confinedEntryForm").reset();
-            renderWIPScreen(payload);
-            setTimeout(fetchActivePermitsFromBackend, 1500);
-        } catch (err) { alert("Network Error!"); }
-        finally { submitBtn.disabled = false; submitBtn.innerText = "Enter in Confined Space"; }
+        } catch (err) {
+            console.error("Background sync error:", err);
+        } finally {
+            submitBtn.disabled = false; 
+            submitBtn.innerText = "Enter in Confined Space";
+        }
     });
 
     function renderWIPScreen(data) {
         document.getElementById("entryFormView").style.display = "none";
         document.getElementById("wipView").style.display = "block";
+
+        // Persist current permit locally across page refreshes
+        localStorage.setItem("AMNS_CURRENT_PERMIT", JSON.stringify(data));
 
         document.getElementById("wipPermitNo").innerText = data.WorkPermitNo;
         document.getElementById("wipCertNo").innerText = data.ConfinedSpaceCertNo;
@@ -524,6 +545,10 @@
             ExitRemarks: document.getElementById("exitRemarks").value
         };
 
+        // Clear local active status
+        delete activePermits[currentPermitKey];
+        localStorage.removeItem("AMNS_CURRENT_PERMIT");
+
         try {
             await fetch(GOOGLE_SCRIPT_URL, {
                 method: "POST",
@@ -534,8 +559,12 @@
 
             alert(`Permit ${currentPermitKey} successfully verified and closed!`);
             resetToLookup();
-        } catch (err) { alert("Network Error!"); }
-        finally { exitSubmitBtn.disabled = false; exitSubmitBtn.innerText = "Complete Work & Register Exit"; }
+        } catch (err) {
+            alert("Network Error during exit submission!");
+        } finally {
+            exitSubmitBtn.disabled = false; 
+            exitSubmitBtn.innerText = "Complete Work & Register Exit";
+        }
     });
 </script>
 
