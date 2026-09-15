@@ -285,6 +285,7 @@
 
 <script>
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxCC5MXaOoOHpfP73-dxuGwnlib99pd9ASNWdnQ801sQOhvZHbwPmw-u6a6MO3gGCdNRw/exec";
+    const POWER_AUTOMATE_URL = "https://default37cd273a1cec4aaea29741480ea54f.8d.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/62e0ced429bc4b2aa03c672bf333334b/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=hj17r1Zp5o87SzxxGK_CULg0KQFwE8MSEzOiGxYcvJo";
     const SECRET_PASS = "AMNSCNF0208";
     
     let activePermits = {};
@@ -296,7 +297,6 @@
             document.getElementById("authOverlay").style.display = "none";
             document.getElementById("mainContent").style.display = "block";
             
-            // Check for locally saved active permit session on load/refresh
             const savedPermit = localStorage.getItem("AMNS_CURRENT_PERMIT");
             if (savedPermit) {
                 const permitData = JSON.parse(savedPermit);
@@ -318,7 +318,6 @@
             const res = await fetch(GOOGLE_SCRIPT_URL);
             if (res.ok) {
                 const remotePermits = await res.json();
-                // Merge remote active permits with local cache
                 activePermits = Object.assign({}, activePermits, remotePermits);
                 renderActivePermitsList();
             }
@@ -427,6 +426,26 @@
         }
     }
 
+    // DISPATCH FUNCTION TO CALL BOTH BACKENDS
+    async function sendDataToBackends(payload) {
+        // 1. Post to Power Automate Endpoint directly
+        const powerAutomatePromise = fetch(POWER_AUTOMATE_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        }).catch(err => console.error("Power Automate Error:", err));
+
+        // 2. Post to Google Apps Script Sheet Logger
+        const googleScriptPromise = fetch(GOOGLE_SCRIPT_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "text/plain" },
+            body: JSON.stringify(payload)
+        }).catch(err => console.error("Google Script Error:", err));
+
+        await Promise.allSettled([powerAutomatePromise, googleScriptPromise]);
+    }
+
     document.getElementById("confinedEntryForm").addEventListener("submit", async function(e) {
         e.preventDefault();
 
@@ -460,34 +479,23 @@
             Timestamp: new Date().toLocaleString()
         };
 
-        // 1. Instantly store permit state locally
+        // Cache locally for immediate visual transition
         activePermits[currentPermitKey] = payload;
         
-        // 2. Render WIP screen immediately so user never sees a blank screen or disappearance
         document.getElementById("confinedEntryForm").reset();
         renderWIPScreen(payload);
 
-        // 3. Post to Google Sheets in the background
-        try {
-            await fetch(GOOGLE_SCRIPT_URL, {
-                method: "POST",
-                mode: "no-cors",
-                headers: { "Content-Type": "text/plain" },
-                body: JSON.stringify(payload)
-            });
-        } catch (err) {
-            console.error("Background sync error:", err);
-        } finally {
-            submitBtn.disabled = false; 
-            submitBtn.innerText = "Enter in Confined Space";
-        }
+        // Send payload to Power Automate and Google Apps Script simultaneously
+        await sendDataToBackends(payload);
+
+        submitBtn.disabled = false; 
+        submitBtn.innerText = "Enter in Confined Space";
     });
 
     function renderWIPScreen(data) {
         document.getElementById("entryFormView").style.display = "none";
         document.getElementById("wipView").style.display = "block";
 
-        // Persist current permit locally across page refreshes
         localStorage.setItem("AMNS_CURRENT_PERMIT", JSON.stringify(data));
 
         document.getElementById("wipPermitNo").innerText = data.WorkPermitNo;
@@ -545,26 +553,17 @@
             ExitRemarks: document.getElementById("exitRemarks").value
         };
 
-        // Clear local active status
         delete activePermits[currentPermitKey];
         localStorage.removeItem("AMNS_CURRENT_PERMIT");
 
-        try {
-            await fetch(GOOGLE_SCRIPT_URL, {
-                method: "POST",
-                mode: "no-cors",
-                headers: { "Content-Type": "text/plain" },
-                body: JSON.stringify(exitPayload)
-            });
+        // Send exit payload to Power Automate and Google Apps Script simultaneously
+        await sendDataToBackends(exitPayload);
 
-            alert(`Permit ${currentPermitKey} successfully verified and closed!`);
-            resetToLookup();
-        } catch (err) {
-            alert("Network Error during exit submission!");
-        } finally {
-            exitSubmitBtn.disabled = false; 
-            exitSubmitBtn.innerText = "Complete Work & Register Exit";
-        }
+        alert(`Permit ${currentPermitKey} successfully verified and closed!`);
+        resetToLookup();
+
+        exitSubmitBtn.disabled = false; 
+        exitSubmitBtn.innerText = "Complete Work & Register Exit";
     });
 </script>
 
