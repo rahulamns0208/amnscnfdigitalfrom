@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AM/NS India - Confined Space Entry Portal</title>
+    <title>AM/NS India - Multi-Permit Confined Space Portal</title>
     <style>
         :root {
             --primary-color: #c8102e;
@@ -97,15 +97,14 @@
         }
 
         .btn-complete { background-color: var(--success-color); }
+        .btn-secondary { background-color: #6c757d; margin-top: 6px; }
 
         .status-message {
             margin-top: 12px; padding: 10px; border-radius: 6px; display: none;
             text-align: center; font-size: 13px; font-weight: bold;
         }
-        .status-message.success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
         .status-message.error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
 
-        /* Work In Progress / Exit Portal Styles */
         .wip-badge {
             background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba;
             padding: 10px; border-radius: 6px; text-align: center; font-weight: bold;
@@ -146,8 +145,25 @@
         <h2>Confined Space & Gas Hazard Area Entry Portal</h2>
     </div>
 
-    <!-- ENTRY FORM VIEW -->
-    <div id="entryFormView">
+    <!-- STEP 1: PERMIT SEARCH / ACCESS SCREEN -->
+    <div id="permitLookupView">
+        <div class="form-group">
+            <label for="lookupPermitNo">Enter Work Permit No. to Access or Create Permit *</label>
+            <input type="text" id="lookupPermitNo" placeholder="E.g., WP-2026-001" autofocus>
+        </div>
+        <button type="button" class="btn-submit" onclick="processPermitLookup()">Proceed with Permit</button>
+        
+        <div style="margin-top: 20px;">
+            <label>Currently Active Work Permits in Progress (This Device):</label>
+            <div id="activePermitsList" style="margin-top: 8px;"></div>
+        </div>
+    </div>
+
+    <!-- STEP 2A: NEW ENTRY FORM VIEW -->
+    <div id="entryFormView" style="display: none;">
+        <div style="margin-bottom: 10px; font-weight: bold; color: var(--primary-color);">
+            Creating New Entry Entry for Permit: <span id="displayEntryPermitNo"></span>
+        </div>
         <form id="confinedEntryForm">
             <div class="row">
                 <div class="form-group">
@@ -190,7 +206,7 @@
             <div class="row">
                 <div class="form-group">
                     <label for="workPermitNo">Work Permit No. *</label>
-                    <input type="text" id="workPermitNo" required placeholder="Enter Work Permit Number">
+                    <input type="text" id="workPermitNo" required readonly style="background-color: #e9ecef;">
                 </div>
                 <div class="form-group">
                     <label for="confCertNo">Confined Space Certificate No. *</label>
@@ -235,7 +251,7 @@
 
             <div class="form-group">
                 <label for="workDescription">Work Description *</label>
-                <textarea id="workDescription" rows="3" required placeholder="Describe the job to be performed..."></textarea>
+                <textarea id="workDescription" rows="3" required placeholder="Describe job..."></textarea>
             </div>
 
             <div class="form-group">
@@ -256,7 +272,7 @@
                         <tbody id="entrantsTableBody">
                             <tr>
                                 <td>1</td>
-                                <td><input type="text" class="entrant-input" required placeholder="Enter Name OR Employee ID"></td>
+                                <td><input type="text" class="entrant-input" required placeholder="Name OR Employee ID"></td>
                             </tr>
                         </tbody>
                     </table>
@@ -265,25 +281,26 @@
 
             <div class="row">
                 <div class="form-group">
-                    <label for="attendantName">Name OR Employee ID of Attendant *</label>
-                    <input type="text" id="attendantName" required placeholder="Attendant Name OR Employee ID">
+                    <label for="attendantName">Attendant (Name / ID) *</label>
+                    <input type="text" id="attendantName" required placeholder="Attendant Name / ID">
                 </div>
                 <div class="form-group">
-                    <label for="supervisorName">Name OR Employee ID of Supervisor *</label>
-                    <input type="text" id="supervisorName" required placeholder="Supervisor Name OR Employee ID">
+                    <label for="supervisorName">Supervisor (Name / ID) *</label>
+                    <input type="text" id="supervisorName" required placeholder="Supervisor Name / ID">
                 </div>
             </div>
 
             <div class="form-group">
-                <label for="rescuePersonName">Name OR Employee ID of Rescue Person *</label>
-                <input type="text" id="rescuePersonName" required placeholder="Rescue Person Name OR Employee ID">
+                <label for="rescuePersonName">Rescue Person (Name / ID) *</label>
+                <input type="text" id="rescuePersonName" required placeholder="Rescue Person Name / ID">
             </div>
 
             <button type="submit" class="btn-submit" id="submitBtn">Enter in Confined Space</button>
+            <button type="button" class="btn-submit btn-secondary" onclick="resetToLookup()">Back to Permit Selection</button>
         </form>
     </div>
 
-    <!-- WORK IN PROGRESS / EXIT VIEW -->
+    <!-- STEP 2B: WORK IN PROGRESS / EXIT VIEW -->
     <div id="wipView" style="display: none;">
         <div class="wip-badge">⚠️ WORK IN PROGRESS - CONFINED SPACE OCCUPIED</div>
         
@@ -318,10 +335,11 @@
 
             <div class="form-group">
                 <label for="exitRemarks">Completion Remarks *</label>
-                <textarea id="exitRemarks" rows="2" required placeholder="E.g., Work completed, space cleared, house-keeping done..."></textarea>
+                <textarea id="exitRemarks" rows="2" required placeholder="E.g., Work completed, space cleared, housekeeping done..."></textarea>
             </div>
 
             <button type="submit" class="btn-submit btn-complete" id="exitSubmitBtn">Complete Work & Register Exit</button>
+            <button type="button" class="btn-submit btn-secondary" onclick="resetToLookup()">Switch / Check Another Permit</button>
         </form>
     </div>
 
@@ -331,13 +349,15 @@
 <script>
     const WEBHOOK_URL = "https://default37cd273a1cec4aaea29741480ea54f.8d.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/62e0ced429bc4b2aa03c672bf333334b/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=hj17r1Zp5o87SzxxGK_CULg0KQFwE8MSEzOiGxYcvJo";
     const SECRET_PASS = "AMNSCNF0208";
+    let activePermits = JSON.parse(localStorage.getItem("AMNS_ACTIVE_PERMITS") || "{}");
+    let currentPermitKey = "";
 
     function verifyPassword() {
         const inputPass = document.getElementById("accessPassword").value;
         if (inputPass === SECRET_PASS) {
             document.getElementById("authOverlay").style.display = "none";
             document.getElementById("mainContent").style.display = "block";
-            checkActiveSession();
+            renderActivePermitsList();
         } else {
             document.getElementById("authError").style.display = "block";
             document.getElementById("accessPassword").value = "";
@@ -348,15 +368,57 @@
         if (e.key === "Enter") verifyPassword();
     });
 
-    function checkActiveSession() {
-        const activePermit = localStorage.getItem("AMNS_ACTIVE_PERMIT");
-        if (activePermit) {
-            const data = JSON.parse(activePermit);
-            renderWIPScreen(data);
+    function renderActivePermitsList() {
+        const container = document.getElementById("activePermitsList");
+        const keys = Object.keys(activePermits);
+        
+        if (keys.length === 0) {
+            container.innerHTML = "<p style='font-size:12px; color:#666;'>No active permits in progress on this device.</p>";
+            return;
+        }
+
+        let html = "<ul style='padding-left: 20px; font-size: 13px;'>";
+        keys.forEach(key => {
+            html += `<li style='margin-bottom: 6px;'>
+                        <strong>${key}</strong> - ${activePermits[key].Department} 
+                        <button type='button' onclick="openPermitDirectly('${key}')" style='margin-left:8px; padding:2px 8px; font-size:11px; cursor:pointer;'>Open WIP</button>
+                     </li>`;
+        });
+        html += "</ul>";
+        container.innerHTML = html;
+    }
+
+    function processPermitLookup() {
+        const permitNo = document.getElementById("lookupPermitNo").value.trim().toUpperCase();
+        if (!permitNo) {
+            alert("Please enter a Work Permit Number.");
+            return;
+        }
+        openPermitDirectly(permitNo);
+    }
+
+    function openPermitDirectly(permitNo) {
+        currentPermitKey = permitNo;
+        document.getElementById("permitLookupView").style.display = "none";
+
+        if (activePermits[permitNo]) {
+            // Existing WIP Permit
+            renderWIPScreen(activePermits[permitNo]);
         } else {
+            // New Entry Permit
             document.getElementById("entryFormView").style.display = "block";
             document.getElementById("wipView").style.display = "none";
+            document.getElementById("displayEntryPermitNo").innerText = permitNo;
+            document.getElementById("workPermitNo").value = permitNo;
         }
+    }
+
+    function resetToLookup() {
+        document.getElementById("permitLookupView").style.display = "block";
+        document.getElementById("entryFormView").style.display = "none";
+        document.getElementById("wipView").style.display = "none";
+        document.getElementById("lookupPermitNo").value = "";
+        renderActivePermitsList();
     }
 
     function generateCertNumbers() {
@@ -386,7 +448,7 @@
             const tr = document.createElement("tr");
             tr.innerHTML = `
                 <td>${i}</td>
-                <td><input type="text" class="entrant-input" required placeholder="Entrant ${i} Name OR Employee ID"></td>
+                <td><input type="text" class="entrant-input" required placeholder="Entrant ${i} Name / ID"></td>
             `;
             tbody.appendChild(tr);
         }
@@ -411,7 +473,7 @@
 
         const payload = {
             Action: "ENTRY",
-            WorkPermitNo: document.getElementById("workPermitNo").value,
+            WorkPermitNo: currentPermitKey,
             ConfinedSpaceCertNo: document.getElementById("confCertNo").value,
             WorkAtHeight: document.querySelector('input[name="workAtHeight"]:checked').value,
             ElectricalWork: document.querySelector('input[name="electricalWork"]:checked').value,
@@ -435,10 +497,12 @@
             });
 
             if (response.ok || response.status === 202) {
-                // Save session in localStorage so it stays active on refresh/navigation
-                localStorage.setItem("AMNS_ACTIVE_PERMIT", JSON.stringify(payload));
+                // Save permit into activePermits collection
+                activePermits[currentPermitKey] = payload;
+                localStorage.setItem("AMNS_ACTIVE_PERMITS", JSON.stringify(activePermits));
+                
                 document.getElementById("confinedEntryForm").reset();
-                checkActiveSession();
+                renderWIPScreen(payload);
             } else {
                 statusMsg.className = "status-message error";
                 statusMsg.innerText = `Submission failed (${response.status}).`;
@@ -471,11 +535,11 @@
         exitTbody.innerHTML = "";
 
         const entrants = data.EntrantsList.split("\n");
-        entrants.forEach((entrant, idx) => {
+        entrants.forEach((entrant) => {
             const tr = document.createElement("tr");
             tr.innerHTML = `
                 <td style="text-align: center;">
-                    <input type="checkbox" class="exit-check" onchange="updateExitCount(${entrants.length})">
+                    <input type="checkbox" class="exit-check" onchange="updateExitCount()">
                 </td>
                 <td>${entrant}</td>
             `;
@@ -485,7 +549,7 @@
         document.getElementById("exitedHeadcount").value = 0;
     }
 
-    function updateExitCount(total) {
+    function updateExitCount() {
         const checked = document.querySelectorAll(".exit-check:checked").length;
         document.getElementById("exitedHeadcount").value = checked;
     }
@@ -494,7 +558,7 @@
     document.getElementById("exitForm").addEventListener("submit", async function(e) {
         e.preventDefault();
 
-        const activeData = JSON.parse(localStorage.getItem("AMNS_ACTIVE_PERMIT"));
+        const activeData = activePermits[currentPermitKey];
         const totalEntrants = activeData.NoOfEntrants;
         const verifiedCount = parseInt(document.getElementById("exitedHeadcount").value, 10);
 
@@ -532,10 +596,12 @@
             });
 
             if (response.ok || response.status === 202) {
-                // Clear active session
-                localStorage.removeItem("AMNS_ACTIVE_PERMIT");
-                alert("Work completed successfully and Exit Log registered!");
-                checkActiveSession();
+                // Delete active permit key on exit
+                delete activePermits[currentPermitKey];
+                localStorage.setItem("AMNS_ACTIVE_PERMITS", JSON.stringify(activePermits));
+                
+                alert(`Permit ${currentPermitKey} successfully closed!`);
+                resetToLookup();
             } else {
                 statusMsg.className = "status-message error";
                 statusMsg.innerText = `Exit submission failed (${response.status}).`;
