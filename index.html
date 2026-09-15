@@ -130,7 +130,7 @@
         <button type="button" class="btn-submit" onclick="processPermitLookup()">Proceed with Permit</button>
         
         <div style="margin-top: 20px;">
-            <label>Active Work Permits in Progress:</label>
+            <label style="color: var(--primary-color); font-size: 14px;">Active Confined Space Work Permits:</label>
             <div id="activePermitsList" style="margin-top: 8px;"></div>
         </div>
     </div>
@@ -290,9 +290,10 @@
 </div>
 
 <script>
-    const WEBHOOK_URL = "https://default37cd273a1cec4aaea29741480ea54f.8d.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/62e0ced429bc4b2aa03c672bf333334b/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=hj17r1Zp5o87SzxxGK_CULg0KQFwE8MSEzOiGxYcvJo";
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxCC5MXaOoOHpfP73-dxuGwnlib99pd9ASNWdnQ801sQOhvZHbwPmw-u6a6MO3gGCdNRw/exec";
     const SECRET_PASS = "AMNSCNF0208";
-    let activePermits = JSON.parse(localStorage.getItem("AMNS_ACTIVE_PERMITS") || "{}");
+    
+    let activePermits = {};
     let currentPermitKey = "";
     let pendingPermitKey = "";
 
@@ -300,9 +301,23 @@
         if (document.getElementById("accessPassword").value === SECRET_PASS) {
             document.getElementById("authOverlay").style.display = "none";
             document.getElementById("mainContent").style.display = "block";
-            renderActivePermitsList();
+            fetchActivePermitsFromBackend();
+            // Automatically refresh active permits every 15 seconds across all devices
+            setInterval(fetchActivePermitsFromBackend, 15000);
         } else {
             document.getElementById("authError").style.display = "block";
+        }
+    }
+
+    async function fetchActivePermitsFromBackend() {
+        try {
+            const res = await fetch(GOOGLE_SCRIPT_URL);
+            if (res.ok) {
+                activePermits = await res.json();
+                renderActivePermitsList();
+            }
+        } catch (err) {
+            console.error("Error fetching active permits:", err);
         }
     }
 
@@ -310,7 +325,7 @@
         const container = document.getElementById("activePermitsList");
         const keys = Object.keys(activePermits);
         if (keys.length === 0) {
-            container.innerHTML = "<p style='font-size:12px; color:#666;'>No active permits registered in local storage.</p>";
+            container.innerHTML = "<p style='font-size:12px; color:#666;'>No active confined space work permits found.</p>";
             return;
         }
 
@@ -351,7 +366,7 @@
         const inputPin = document.getElementById("verifyPinInput").value;
         const targetPermit = activePermits[pendingPermitKey];
 
-        if (targetPermit && targetPermit.Pin === inputPin) {
+        if (targetPermit && String(targetPermit.Pin) === String(inputPin)) {
             currentPermitKey = pendingPermitKey;
             closePinModal();
             document.getElementById("permitLookupView").style.display = "none";
@@ -375,7 +390,7 @@
         document.getElementById("entryFormView").style.display = "none";
         document.getElementById("wipView").style.display = "none";
         document.getElementById("lookupPermitNo").value = "";
-        renderActivePermitsList();
+        fetchActivePermitsFromBackend();
     }
 
     function generateCertNumbers() {
@@ -437,16 +452,15 @@
         };
 
         try {
-            const response = await fetch(WEBHOOK_URL, {
-                method: "POST", headers: { "Content-Type": "application/json" },
+            const response = await fetch(GOOGLE_SCRIPT_URL, {
+                method: "POST",
                 body: JSON.stringify(payload)
             });
 
-            if (response.ok || response.status === 202) {
-                activePermits[currentPermitKey] = payload;
-                localStorage.setItem("AMNS_ACTIVE_PERMITS", JSON.stringify(activePermits));
+            if (response.ok) {
                 document.getElementById("confinedEntryForm").reset();
                 renderWIPScreen(payload);
+                fetchActivePermitsFromBackend();
             }
         } catch (err) { alert("Network Error!"); }
         finally { submitBtn.disabled = false; submitBtn.innerText = "Enter in Confined Space"; }
@@ -459,17 +473,20 @@
         document.getElementById("wipPermitNo").innerText = data.WorkPermitNo;
         document.getElementById("wipCertNo").innerText = data.ConfinedSpaceCertNo;
         document.getElementById("wipDeptArea").innerText = `${data.Department} / ${data.AreaCategory}`;
-        document.getElementById("wipEntryTime").innerText = data.Timestamp;
+        document.getElementById("wipEntryTime").innerText = data.Timestamp || data.EntryTimestamp;
         document.getElementById("wipAttendant").innerText = data.AttendantName;
         document.getElementById("wipSupervisor").innerText = data.SupervisorName;
         document.getElementById("wipRescue").innerText = data.RescuePersonName;
 
         const exitTbody = document.getElementById("exitEntrantsTableBody");
         exitTbody.innerHTML = "";
-        data.EntrantsList.split("\n").forEach((entrant) => {
-            const tr = document.createElement("tr");
-            tr.innerHTML = `<td style="text-align: center;"><input type="checkbox" class="exit-check" onchange="updateExitCount()"></td><td>${entrant}</td>`;
-            exitTbody.appendChild(tr);
+        const entrants = (data.EntrantsList || "").split("\n");
+        entrants.forEach((entrant) => {
+            if (entrant.trim() !== "") {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `<td style="text-align: center;"><input type="checkbox" class="exit-check" onchange="updateExitCount()"></td><td>${entrant}</td>`;
+                exitTbody.appendChild(tr);
+            }
         });
         document.getElementById("exitedHeadcount").value = 0;
     }
@@ -482,9 +499,10 @@
         e.preventDefault();
         const activeData = activePermits[currentPermitKey];
         const verifiedCount = parseInt(document.getElementById("exitedHeadcount").value, 10);
+        const totalExpected = parseInt(activeData.NoOfEntrants, 10);
 
-        if (verifiedCount !== activeData.NoOfEntrants) {
-            alert(`Headcount mismatch! All ${activeData.NoOfEntrants} entrants must be verified safe before closing permit.`);
+        if (verifiedCount !== totalExpected) {
+            alert(`Headcount mismatch! All ${totalExpected} entrants must be verified safe before closing permit.`);
             return;
         }
 
@@ -501,21 +519,19 @@
             AttendantName: activeData.AttendantName,
             SupervisorName: activeData.SupervisorName,
             RescuePersonName: activeData.RescuePersonName,
-            EntryTimestamp: activeData.Timestamp,
+            EntryTimestamp: activeData.Timestamp || activeData.EntryTimestamp,
             ExitTimestamp: new Date().toLocaleString(),
             ExitedHeadcount: verifiedCount,
             ExitRemarks: document.getElementById("exitRemarks").value
         };
 
         try {
-            const response = await fetch(WEBHOOK_URL, {
-                method: "POST", headers: { "Content-Type": "application/json" },
+            const response = await fetch(GOOGLE_SCRIPT_URL, {
+                method: "POST",
                 body: JSON.stringify(exitPayload)
             });
 
-            if (response.ok || response.status === 202) {
-                delete activePermits[currentPermitKey];
-                localStorage.setItem("AMNS_ACTIVE_PERMITS", JSON.stringify(activePermits));
+            if (response.ok) {
                 alert(`Permit ${currentPermitKey} successfully verified and closed!`);
                 resetToLookup();
             }
