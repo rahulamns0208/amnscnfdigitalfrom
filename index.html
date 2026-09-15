@@ -3,18 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AM/NS India - Multi-Permit Confined Space Portal</title>
+    <title>AM/NS India - Secure Multi-Permit Confined Space Portal</title>
     <style>
         :root {
             --primary-color: #c8102e;
-            --primary-hover: #a00c23;
             --secondary-color: #222222;
             --bg-color: #f4f6f9;
             --card-bg: #ffffff;
             --text-color: #333333;
             --border-color: #cccccc;
             --success-color: #28a745;
-            --warning-color: #ffc107;
         }
 
         * { box-sizing: border-box; }
@@ -25,12 +23,10 @@
             color: var(--text-color);
             margin: 0;
             padding: 10px;
-            -webkit-tap-highlight-color: transparent;
         }
 
         #authOverlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(0, 0, 0, 0.85);
             display: flex; justify-content: center; align-items: center;
             z-index: 9999; padding: 16px;
@@ -39,52 +35,30 @@
         .auth-card {
             background: #ffffff; padding: 24px 20px; border-radius: 8px;
             width: 100%; max-width: 380px; text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
-        .auth-card h3 { margin-top: 0; color: var(--primary-color); font-size: 18px; }
+        .auth-card h3 { margin-top: 0; color: var(--primary-color); }
         .auth-card input { margin-bottom: 12px; text-align: center; font-size: 16px; width: 100%; padding: 10px; }
         .auth-error { color: #d9534f; font-size: 12px; display: none; font-weight: bold; }
 
         .container {
-            max-width: 850px; margin: 0 auto;
-            background: var(--card-bg); padding: 16px 12px;
-            border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-            display: none;
+            max-width: 850px; margin: 0 auto; background: var(--card-bg);
+            padding: 16px 12px; border-radius: 8px; display: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
         }
 
-        .header {
-            text-align: center; border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 10px; margin-bottom: 16px;
-        }
-
-        .header h1 { color: var(--primary-color); margin: 0; font-size: 18px; text-transform: uppercase; }
-        .header h2 { color: var(--secondary-color); margin: 4px 0 0 0; font-size: 13px; font-weight: 500; }
+        .header { text-align: center; border-bottom: 2px solid var(--primary-color); padding-bottom: 10px; margin-bottom: 16px; }
+        .header h1 { color: var(--primary-color); margin: 0; font-size: 18px; }
 
         .form-group { margin-bottom: 14px; }
-        label { display: block; font-weight: 600; margin-bottom: 5px; color: var(--secondary-color); font-size: 13px; }
+        label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 13px; }
 
         .row { display: flex; flex-direction: column; gap: 0; }
 
         input[type="text"], input[type="number"], input[type="password"], select, textarea {
             width: 100%; padding: 10px 12px; border: 1px solid var(--border-color);
-            border-radius: 6px; font-size: 15px; background-color: #fff;
+            border-radius: 6px; font-size: 15px;
         }
-
-        .checkbox-group {
-            display: flex; flex-direction: column; gap: 12px;
-            background: #f8f9fa; padding: 14px; border: 1px solid var(--border-color); border-radius: 6px;
-        }
-
-        .checkbox-item { display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 13px; }
-
-        .toggle-switch { display: flex; border: 1px solid var(--border-color); border-radius: 6px; overflow: hidden; }
-        .toggle-switch input[type="radio"] { display: none; }
-        .toggle-switch label {
-            padding: 6px 14px; margin: 0; font-size: 12px; font-weight: bold;
-            cursor: pointer; background-color: #ffffff; color: #555555;
-        }
-        .toggle-switch input[type="radio"]:checked + label { background-color: var(--primary-color); color: #ffffff; }
 
         .entrants-table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         .entrants-table th, .entrants-table td { border: 1px solid var(--border-color); padding: 6px 8px; text-align: left; }
@@ -99,31 +73,23 @@
         .btn-complete { background-color: var(--success-color); }
         .btn-secondary { background-color: #6c757d; margin-top: 6px; }
 
-        .status-message {
-            margin-top: 12px; padding: 10px; border-radius: 6px; display: none;
-            text-align: center; font-size: 13px; font-weight: bold;
-        }
-        .status-message.error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .status-message { margin-top: 12px; padding: 10px; border-radius: 6px; display: none; text-align: center; font-size: 13px; font-weight: bold; }
+        .status-message.error { background-color: #f8d7da; color: #721c24; }
 
-        .wip-badge {
-            background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba;
-            padding: 10px; border-radius: 6px; text-align: center; font-weight: bold;
-            margin-bottom: 16px; font-size: 14px;
-        }
+        .wip-badge { background-color: #fff3cd; color: #856404; padding: 10px; border-radius: 6px; text-align: center; font-weight: bold; margin-bottom: 16px; }
+        .summary-card { background: #f8f9fa; border: 1px solid var(--border-color); border-radius: 6px; padding: 12px; margin-bottom: 16px; font-size: 13px; }
 
-        .summary-card {
-            background: #f8f9fa; border: 1px solid var(--border-color);
-            border-radius: 6px; padding: 12px; margin-bottom: 16px; font-size: 13px;
+        #pinModal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 10000;
         }
-
-        .summary-card p { margin: 6px 0; }
+        .pin-card { background: #fff; padding: 20px; border-radius: 8px; text-align: center; width: 90%; max-width: 350px; }
 
         @media (min-width: 600px) {
             body { padding: 20px; }
             .container { padding: 30px; }
             .row { flex-direction: row; gap: 15px; }
             .row .form-group { flex: 1; }
-            .checkbox-group { flex-direction: row; justify-content: space-between; }
         }
     </style>
 </head>
@@ -132,10 +98,20 @@
 <div id="authOverlay">
     <div class="auth-card">
         <h3>AM/NS INDIA</h3>
-        <p>Confined Space Portal Security</p>
+        <p>Portal Master Security Access</p>
         <input type="password" id="accessPassword" placeholder="Enter Portal Password" autofocus>
         <button type="button" class="btn-submit" onclick="verifyPassword()">Unlock Portal</button>
         <div id="authError" class="auth-error">Incorrect Password! Access Denied.</div>
+    </div>
+</div>
+
+<div id="pinModal">
+    <div class="pin-card">
+        <h4 style="margin-top:0; color: var(--primary-color);">🔐 Permit Security Verification</h4>
+        <p style="font-size: 12px; color: #555;">Enter the 4-digit Security PIN created during permit initiation:</p>
+        <input type="password" id="verifyPinInput" maxlength="4" placeholder="4-Digit PIN" style="text-align: center; font-size: 18px; margin-bottom: 10px;">
+        <button type="button" class="btn-submit" onclick="confirmPermitPin()">Authorize & Access</button>
+        <button type="button" class="btn-submit btn-secondary" onclick="closePinModal()">Cancel</button>
     </div>
 </div>
 
@@ -145,7 +121,7 @@
         <h2>Confined Space & Gas Hazard Area Entry Portal</h2>
     </div>
 
-    <!-- STEP 1: PERMIT SEARCH / ACCESS SCREEN -->
+    <!-- LOOKUP VIEW -->
     <div id="permitLookupView">
         <div class="form-group">
             <label for="lookupPermitNo">Enter Work Permit No. to Access or Create Permit *</label>
@@ -154,15 +130,15 @@
         <button type="button" class="btn-submit" onclick="processPermitLookup()">Proceed with Permit</button>
         
         <div style="margin-top: 20px;">
-            <label>Currently Active Work Permits in Progress (This Device):</label>
+            <label>Active Work Permits in Progress:</label>
             <div id="activePermitsList" style="margin-top: 8px;"></div>
         </div>
     </div>
 
-    <!-- STEP 2A: NEW ENTRY FORM VIEW -->
+    <!-- NEW ENTRY VIEW -->
     <div id="entryFormView" style="display: none;">
         <div style="margin-bottom: 10px; font-weight: bold; color: var(--primary-color);">
-            Creating New Entry Entry for Permit: <span id="displayEntryPermitNo"></span>
+            Creating New Entry for Permit: <span id="displayEntryPermitNo"></span>
         </div>
         <form id="confinedEntryForm">
             <div class="row">
@@ -179,25 +155,34 @@
                     <label for="department">Department *</label>
                     <select id="department" required onchange="generateCertNumbers()">
                         <option value="">Select Department</option>
+                        
                         <optgroup label="CGL">
                             <option value="CGL_MECH">CGL - Mechanical</option>
                             <option value="CGL_ELEC">CGL - Electrical</option>
                             <option value="CGL_PROD">CGL - Production</option>
                         </optgroup>
+
                         <optgroup label="CCL">
                             <option value="CCL_MECH">CCL - Mechanical</option>
                             <option value="CCL_ELEC">CCL - Electrical</option>
                             <option value="CCL_PROD">CCL - Production</option>
                         </optgroup>
+
                         <optgroup label="CRM">
                             <option value="CRM_MECH">CRM - Mechanical</option>
                             <option value="CRM_ELEC">CRM - Electrical</option>
                             <option value="CRM_PROD">CRM - Production</option>
                         </optgroup>
+
                         <optgroup label="UTILITY">
                             <option value="UTILITY_MECH">UTILITY - Mechanical</option>
                             <option value="UTILITY_ELEC">UTILITY - Electrical</option>
                             <option value="UTILITY_PROD">UTILITY - Production</option>
+                        </optgroup>
+
+                        <optgroup label="GENERAL / MANAGEMENT">
+                            <option value="ADMIN">ADMIN</option>
+                            <option value="LOGISTICS">LOGISTICS</option>
                         </optgroup>
                     </select>
                 </div>
@@ -216,37 +201,10 @@
                 </div>
             </div>
 
-            <div class="form-group">
-                <label>Associated Hazards & Work Types *</label>
-                <div class="checkbox-group">
-                    <div class="checkbox-item">
-                        <span>Work at Height:</span>
-                        <div class="toggle-switch">
-                            <input type="radio" id="heightNo" name="workAtHeight" value="NO" checked>
-                            <label for="heightNo">NO</label>
-                            <input type="radio" id="heightYes" name="workAtHeight" value="YES">
-                            <label for="heightYes">YES</label>
-                        </div>
-                    </div>
-                    <div class="checkbox-item">
-                        <span>Electrical Work:</span>
-                        <div class="toggle-switch">
-                            <input type="radio" id="elecNo" name="electricalWork" value="NO" checked>
-                            <label for="elecNo">NO</label>
-                            <input type="radio" id="elecYes" name="electricalWork" value="YES">
-                            <label for="elecYes">YES</label>
-                        </div>
-                    </div>
-                    <div class="checkbox-item">
-                        <span>Welding / Cutting:</span>
-                        <div class="toggle-switch">
-                            <input type="radio" id="weldNo" name="weldingWork" value="NO" checked>
-                            <label for="weldNo">NO</label>
-                            <input type="radio" id="weldYes" name="weldingWork" value="YES">
-                            <label for="weldYes">YES</label>
-                        </div>
-                    </div>
-                </div>
+            <div class="form-group" style="background: #e9ecef; padding: 12px; border-radius: 6px;">
+                <label for="createPin" style="color: var(--primary-color);">Set 4-Digit Security PIN for this Permit *</label>
+                <input type="password" id="createPin" maxlength="4" required placeholder="Set 4-digit PIN (e.g. 1234)" style="text-align: center; font-weight: bold;">
+                <span style="font-size: 11px; color: #666;">This PIN will be required to access or close this specific permit later.</span>
             </div>
 
             <div class="form-group">
@@ -261,22 +219,12 @@
 
             <div class="form-group">
                 <label>Name OR Employee ID of Entrants</label>
-                <div class="entrants-wrapper">
-                    <table class="entrants-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 12%;">#</th>
-                                <th>Entrant Name OR Employee ID</th>
-                            </tr>
-                        </thead>
-                        <tbody id="entrantsTableBody">
-                            <tr>
-                                <td>1</td>
-                                <td><input type="text" class="entrant-input" required placeholder="Name OR Employee ID"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                <table class="entrants-table">
+                    <thead><tr><th style="width: 12%;">#</th><th>Entrant Name OR Employee ID</th></tr></thead>
+                    <tbody id="entrantsTableBody">
+                        <tr><td>1</td><td><input type="text" class="entrant-input" required placeholder="Name / ID"></td></tr>
+                    </tbody>
+                </table>
             </div>
 
             <div class="row">
@@ -296,11 +244,11 @@
             </div>
 
             <button type="submit" class="btn-submit" id="submitBtn">Enter in Confined Space</button>
-            <button type="button" class="btn-submit btn-secondary" onclick="resetToLookup()">Back to Permit Selection</button>
+            <button type="button" class="btn-submit btn-secondary" onclick="resetToLookup()">Back to Lookup</button>
         </form>
     </div>
 
-    <!-- STEP 2B: WORK IN PROGRESS / EXIT VIEW -->
+    <!-- WORK IN PROGRESS / EXIT VIEW -->
     <div id="wipView" style="display: none;">
         <div class="wip-badge">⚠️ WORK IN PROGRESS - CONFINED SPACE OCCUPIED</div>
         
@@ -318,12 +266,7 @@
             <div class="form-group">
                 <label>Verification of Headcount (Check all entrants who have safely exited):</label>
                 <table class="entrants-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 10%;">Safe</th>
-                            <th>Entrant Details</th>
-                        </tr>
-                    </thead>
+                    <thead><tr><th style="width: 10%;">Safe</th><th>Entrant Details</th></tr></thead>
                     <tbody id="exitEntrantsTableBody"></tbody>
                 </table>
             </div>
@@ -335,7 +278,7 @@
 
             <div class="form-group">
                 <label for="exitRemarks">Completion Remarks *</label>
-                <textarea id="exitRemarks" rows="2" required placeholder="E.g., Work completed, space cleared, housekeeping done..."></textarea>
+                <textarea id="exitRemarks" rows="2" required placeholder="E.g., Work completed, space cleared..."></textarea>
             </div>
 
             <button type="submit" class="btn-submit btn-complete" id="exitSubmitBtn">Complete Work & Register Exit</button>
@@ -351,37 +294,31 @@
     const SECRET_PASS = "AMNSCNF0208";
     let activePermits = JSON.parse(localStorage.getItem("AMNS_ACTIVE_PERMITS") || "{}");
     let currentPermitKey = "";
+    let pendingPermitKey = "";
 
     function verifyPassword() {
-        const inputPass = document.getElementById("accessPassword").value;
-        if (inputPass === SECRET_PASS) {
+        if (document.getElementById("accessPassword").value === SECRET_PASS) {
             document.getElementById("authOverlay").style.display = "none";
             document.getElementById("mainContent").style.display = "block";
             renderActivePermitsList();
         } else {
             document.getElementById("authError").style.display = "block";
-            document.getElementById("accessPassword").value = "";
         }
     }
-
-    document.getElementById("accessPassword").addEventListener("keypress", function(e) {
-        if (e.key === "Enter") verifyPassword();
-    });
 
     function renderActivePermitsList() {
         const container = document.getElementById("activePermitsList");
         const keys = Object.keys(activePermits);
-        
         if (keys.length === 0) {
-            container.innerHTML = "<p style='font-size:12px; color:#666;'>No active permits in progress on this device.</p>";
+            container.innerHTML = "<p style='font-size:12px; color:#666;'>No active permits registered in local storage.</p>";
             return;
         }
 
         let html = "<ul style='padding-left: 20px; font-size: 13px;'>";
         keys.forEach(key => {
             html += `<li style='margin-bottom: 6px;'>
-                        <strong>${key}</strong> - ${activePermits[key].Department} 
-                        <button type='button' onclick="openPermitDirectly('${key}')" style='margin-left:8px; padding:2px 8px; font-size:11px; cursor:pointer;'>Open WIP</button>
+                        <strong>${key}</strong> - ${activePermits[key].Department} 🔒
+                        <button type='button' onclick="requestPermitAccess('${key}')" style='margin-left:8px; padding:2px 8px; font-size:11px; cursor:pointer;'>Access WIP</button>
                      </li>`;
         });
         html += "</ul>";
@@ -390,27 +327,47 @@
 
     function processPermitLookup() {
         const permitNo = document.getElementById("lookupPermitNo").value.trim().toUpperCase();
-        if (!permitNo) {
-            alert("Please enter a Work Permit Number.");
-            return;
+        if (!permitNo) { alert("Please enter a Work Permit Number."); return; }
+        
+        if (activePermits[permitNo]) {
+            requestPermitAccess(permitNo);
+        } else {
+            openNewPermitForm(permitNo);
         }
-        openPermitDirectly(permitNo);
     }
 
-    function openPermitDirectly(permitNo) {
+    function requestPermitAccess(permitNo) {
+        pendingPermitKey = permitNo;
+        document.getElementById("verifyPinInput").value = "";
+        document.getElementById("pinModal").style.display = "flex";
+    }
+
+    function closePinModal() {
+        document.getElementById("pinModal").style.display = "none";
+        pendingPermitKey = "";
+    }
+
+    function confirmPermitPin() {
+        const inputPin = document.getElementById("verifyPinInput").value;
+        const targetPermit = activePermits[pendingPermitKey];
+
+        if (targetPermit && targetPermit.Pin === inputPin) {
+            currentPermitKey = pendingPermitKey;
+            closePinModal();
+            document.getElementById("permitLookupView").style.display = "none";
+            renderWIPScreen(targetPermit);
+        } else {
+            alert("Incorrect Security PIN for this permit!");
+        }
+    }
+
+    function openNewPermitForm(permitNo) {
         currentPermitKey = permitNo;
         document.getElementById("permitLookupView").style.display = "none";
-
-        if (activePermits[permitNo]) {
-            // Existing WIP Permit
-            renderWIPScreen(activePermits[permitNo]);
-        } else {
-            // New Entry Permit
-            document.getElementById("entryFormView").style.display = "block";
-            document.getElementById("wipView").style.display = "none";
-            document.getElementById("displayEntryPermitNo").innerText = permitNo;
-            document.getElementById("workPermitNo").value = permitNo;
-        }
+        document.getElementById("entryFormView").style.display = "block";
+        document.getElementById("wipView").style.display = "none";
+        document.getElementById("displayEntryPermitNo").innerText = permitNo;
+        document.getElementById("workPermitNo").value = permitNo;
     }
 
     function resetToLookup() {
@@ -432,8 +389,7 @@
         for (let i = 1; i <= 60; i++) {
             let certNum = `AMNS/${formattedDept}/CNF/${i}/${area}`;
             let option = document.createElement("option");
-            option.value = certNum;
-            option.textContent = certNum;
+            option.value = certNum; option.textContent = certNum;
             certDropdown.appendChild(option);
         }
     }
@@ -442,42 +398,33 @@
         const count = parseInt(document.getElementById("noOfEntrants").value, 10) || 0;
         const tbody = document.getElementById("entrantsTableBody");
         tbody.innerHTML = "";
-        if (count < 1) return;
-
         for (let i = 1; i <= count; i++) {
             const tr = document.createElement("tr");
-            tr.innerHTML = `
-                <td>${i}</td>
-                <td><input type="text" class="entrant-input" required placeholder="Entrant ${i} Name / ID"></td>
-            `;
+            tr.innerHTML = `<td>${i}</td><td><input type="text" class="entrant-input" required placeholder="Entrant ${i} Name / ID"></td>`;
             tbody.appendChild(tr);
         }
     }
 
-    /* HANDLE ENTRY SUBMISSION */
     document.getElementById("confinedEntryForm").addEventListener("submit", async function(e) {
         e.preventDefault();
 
+        const pin = document.getElementById("createPin").value;
+        if (pin.length !== 4) { alert("PIN must be exactly 4 digits."); return; }
+
         const submitBtn = document.getElementById("submitBtn");
-        const statusMsg = document.getElementById("statusMessage");
-        submitBtn.disabled = true;
-        submitBtn.innerText = "Submitting Entry...";
+        submitBtn.disabled = true; submitBtn.innerText = "Submitting Entry...";
 
         const entrantInputs = document.querySelectorAll(".entrant-input");
         const entrantsList = [];
         entrantInputs.forEach((input, index) => {
-            if (input.value.trim() !== "") {
-                entrantsList.push(`${index + 1}. ${input.value.trim()}`);
-            }
+            if (input.value.trim() !== "") entrantsList.push(`${index + 1}. ${input.value.trim()}`);
         });
 
         const payload = {
             Action: "ENTRY",
             WorkPermitNo: currentPermitKey,
+            Pin: pin,
             ConfinedSpaceCertNo: document.getElementById("confCertNo").value,
-            WorkAtHeight: document.querySelector('input[name="workAtHeight"]:checked').value,
-            ElectricalWork: document.querySelector('input[name="electricalWork"]:checked').value,
-            WeldingCuttingWork: document.querySelector('input[name="weldingWork"]:checked').value,
             AreaCategory: document.getElementById("area").value,
             Department: document.getElementById("department").value,
             WorkDescription: document.getElementById("workDescription").value,
@@ -491,34 +438,20 @@
 
         try {
             const response = await fetch(WEBHOOK_URL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
+                method: "POST", headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             });
 
             if (response.ok || response.status === 202) {
-                // Save permit into activePermits collection
                 activePermits[currentPermitKey] = payload;
                 localStorage.setItem("AMNS_ACTIVE_PERMITS", JSON.stringify(activePermits));
-                
                 document.getElementById("confinedEntryForm").reset();
                 renderWIPScreen(payload);
-            } else {
-                statusMsg.className = "status-message error";
-                statusMsg.innerText = `Submission failed (${response.status}).`;
-                statusMsg.style.display = "block";
             }
-        } catch (err) {
-            statusMsg.className = "status-message error";
-            statusMsg.innerText = "Network Error! Power Automate endpoint unreachable.";
-            statusMsg.style.display = "block";
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.innerText = "Enter in Confined Space";
-        }
+        } catch (err) { alert("Network Error!"); }
+        finally { submitBtn.disabled = false; submitBtn.innerText = "Enter in Confined Space"; }
     });
 
-    /* RENDER WIP & EXIT DASHBOARD */
     function renderWIPScreen(data) {
         document.getElementById("entryFormView").style.display = "none";
         document.getElementById("wipView").style.display = "block";
@@ -533,44 +466,30 @@
 
         const exitTbody = document.getElementById("exitEntrantsTableBody");
         exitTbody.innerHTML = "";
-
-        const entrants = data.EntrantsList.split("\n");
-        entrants.forEach((entrant) => {
+        data.EntrantsList.split("\n").forEach((entrant) => {
             const tr = document.createElement("tr");
-            tr.innerHTML = `
-                <td style="text-align: center;">
-                    <input type="checkbox" class="exit-check" onchange="updateExitCount()">
-                </td>
-                <td>${entrant}</td>
-            `;
+            tr.innerHTML = `<td style="text-align: center;"><input type="checkbox" class="exit-check" onchange="updateExitCount()"></td><td>${entrant}</td>`;
             exitTbody.appendChild(tr);
         });
-
         document.getElementById("exitedHeadcount").value = 0;
     }
 
     function updateExitCount() {
-        const checked = document.querySelectorAll(".exit-check:checked").length;
-        document.getElementById("exitedHeadcount").value = checked;
+        document.getElementById("exitedHeadcount").value = document.querySelectorAll(".exit-check:checked").length;
     }
 
-    /* HANDLE EXIT SUBMISSION */
     document.getElementById("exitForm").addEventListener("submit", async function(e) {
         e.preventDefault();
-
         const activeData = activePermits[currentPermitKey];
-        const totalEntrants = activeData.NoOfEntrants;
         const verifiedCount = parseInt(document.getElementById("exitedHeadcount").value, 10);
 
-        if (verifiedCount !== totalEntrants) {
-            alert(`Headcount mismatch! All ${totalEntrants} entrants must be verified safe before closing permit.`);
+        if (verifiedCount !== activeData.NoOfEntrants) {
+            alert(`Headcount mismatch! All ${activeData.NoOfEntrants} entrants must be verified safe before closing permit.`);
             return;
         }
 
         const exitSubmitBtn = document.getElementById("exitSubmitBtn");
-        const statusMsg = document.getElementById("statusMessage");
-        exitSubmitBtn.disabled = true;
-        exitSubmitBtn.innerText = "Submitting Exit Log...";
+        exitSubmitBtn.disabled = true; exitSubmitBtn.innerText = "Submitting Exit Log...";
 
         const exitPayload = {
             Action: "EXIT",
@@ -590,31 +509,18 @@
 
         try {
             const response = await fetch(WEBHOOK_URL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
+                method: "POST", headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(exitPayload)
             });
 
             if (response.ok || response.status === 202) {
-                // Delete active permit key on exit
                 delete activePermits[currentPermitKey];
                 localStorage.setItem("AMNS_ACTIVE_PERMITS", JSON.stringify(activePermits));
-                
-                alert(`Permit ${currentPermitKey} successfully closed!`);
+                alert(`Permit ${currentPermitKey} successfully verified and closed!`);
                 resetToLookup();
-            } else {
-                statusMsg.className = "status-message error";
-                statusMsg.innerText = `Exit submission failed (${response.status}).`;
-                statusMsg.style.display = "block";
             }
-        } catch (err) {
-            statusMsg.className = "status-message error";
-            statusMsg.innerText = "Network Error! Endpoint unreachable.";
-            statusMsg.style.display = "block";
-        } finally {
-            exitSubmitBtn.disabled = false;
-            exitSubmitBtn.innerText = "Complete Work & Register Exit";
-        }
+        } catch (err) { alert("Network Error!"); }
+        finally { exitSubmitBtn.disabled = false; exitSubmitBtn.innerText = "Complete Work & Register Exit"; }
     });
 </script>
 
