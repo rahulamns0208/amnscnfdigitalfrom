@@ -124,8 +124,10 @@
     <div class="auth-card">
         <h3>AM/NS INDIA</h3>
         <p>Portal Master Security Access</p>
-        <input type="password" id="accessPassword" placeholder="Enter Portal Password" autofocus>
-        <button type="button" class="btn-submit" onclick="verifyPassword()">Unlock Portal</button>
+        <form onsubmit="event.preventDefault(); verifyPassword();">
+            <input type="password" id="accessPassword" placeholder="Enter Portal Password" required autofocus>
+            <button type="submit" class="btn-submit">Unlock Portal</button>
+        </form>
         <div id="authError" class="auth-error">Incorrect Password! Access Denied.</div>
     </div>
 </div>
@@ -147,9 +149,11 @@
     <div class="modal-card" style="max-width: 360px; text-align: center;">
         <h4 style="margin-top:0; color: var(--primary-color);">🔒 Enter Security PIN</h4>
         <p style="font-size: 12px; color: #555;">Enter 4-digit PIN for Permit: <strong id="targetPermitDisplay"></strong></p>
-        <input type="password" id="verifyPinInput" maxlength="4" placeholder="4-Digit PIN" style="text-align: center; font-size: 18px; margin-bottom: 10px;">
-        <button type="button" class="btn-submit" onclick="confirmPermitPin()">Authorize & Access</button>
-        <button type="button" class="btn-submit btn-secondary" onclick="closePinModal()">Cancel</button>
+        <form onsubmit="event.preventDefault(); confirmPermitPin();">
+            <input type="password" id="verifyPinInput" maxlength="4" pattern="\d{4}" placeholder="4-Digit PIN" required style="text-align: center; font-size: 18px; margin-bottom: 10px;">
+            <button type="submit" class="btn-submit">Authorize & Access</button>
+            <button type="button" class="btn-submit btn-secondary" onclick="closePinModal()">Cancel</button>
+        </form>
     </div>
 </div>
 
@@ -167,11 +171,13 @@
 
     <!-- LOOKUP VIEW -->
     <div id="permitLookupView">
-        <div class="form-group">
-            <label for="lookupPermitNo">Enter Work Permit No. to Access or Initiate Permit *</label>
-            <input type="text" id="lookupPermitNo" placeholder="E.g., WP-2026-001" autofocus>
-        </div>
-        <button type="button" class="btn-submit" onclick="processPermitLookup()">Proceed with Permit</button>
+        <form onsubmit="event.preventDefault(); processPermitLookup();">
+            <div class="form-group">
+                <label for="lookupPermitNo">Enter Work Permit No. to Access or Initiate Permit *</label>
+                <input type="text" id="lookupPermitNo" placeholder="E.g., WP-2026-001" required autofocus>
+            </div>
+            <button type="submit" class="btn-submit">Proceed with Permit</button>
+        </form>
     </div>
 
     <!-- NEW ENTRY VIEW -->
@@ -233,7 +239,7 @@
 
             <div class="form-group" style="background: #e9ecef; padding: 12px; border-radius: 6px;">
                 <label for="createPin" style="color: var(--primary-color);">Set 4-Digit Security PIN for this Permit *</label>
-                <input type="password" id="createPin" maxlength="4" required placeholder="Set 4-digit PIN" style="text-align: center; font-weight: bold;">
+                <input type="password" id="createPin" maxlength="4" pattern="\d{4}" required placeholder="Set 4-digit PIN" style="text-align: center; font-weight: bold;">
             </div>
 
             <div class="form-group">
@@ -247,7 +253,7 @@
             </div>
 
             <div class="form-group">
-                <label>Name OR Employee ID of Entrants</label>
+                <label>Name OR Employee ID of Entrants *</label>
                 <table class="entrants-table">
                     <thead><tr><th style="width: 12%;">#</th><th>Entrant Name OR Employee ID</th></tr></thead>
                     <tbody id="entrantsTableBody">
@@ -280,7 +286,7 @@
     <!-- WORK IN PROGRESS / EXIT VIEW -->
     <div id="wipView" style="display: none;">
         <div class="wip-badge">⚠️ WORK IN PROGRESS - CONFINED SPACE OCCUPIED</div>
-        
+
         <div class="summary-card">
             <p><strong>Permit No:</strong> <span id="wipPermitNo"></span></p>
             <p><strong>Certificate No:</strong> <span id="wipCertNo"></span></p>
@@ -293,7 +299,7 @@
 
         <form id="exitForm">
             <div class="form-group">
-                <label>Verification of Headcount (Check all entrants who have safely exited):</label>
+                <label>Verification of Headcount (Check all entrants who have safely exited) *:</label>
                 <table class="entrants-table">
                     <thead><tr><th style="width: 10%;">Safe</th><th>Entrant Details</th></tr></thead>
                     <tbody id="exitEntrantsTableBody"></tbody>
@@ -307,7 +313,7 @@
 
             <div class="form-group" style="background: #e9ecef; padding: 12px; border-radius: 6px;">
                 <label for="exitPin" style="color: var(--primary-color);">Enter 4-Digit Security PIN to Authorize Exit *</label>
-                <input type="password" id="exitPin" maxlength="4" required placeholder="Enter 4-digit PIN" style="text-align: center; font-weight: bold;">
+                <input type="password" id="exitPin" maxlength="4" pattern="\d{4}" required placeholder="Enter 4-digit PIN" style="text-align: center; font-weight: bold;">
             </div>
 
             <div class="form-group">
@@ -323,10 +329,10 @@
 
 <script>
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzmoGhU9kQUYlf8nZCnlJAl_PC-gp8lARpkXjBhdSyA4dra3yiZO6K2TfNOHLGIXTWC/exec";
-    const POWER_AUTOMATE_URL = "https://default37cd273a1cec4aaea29741480ea54f.8d.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/62e0ced429bc4b2aa03c672bf333334b/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=hj17r1Zp5o87SzxxGK_CULg0KQFwE8MSEzOiGxYcvJo";
-    
+    const POWER_AUTOMATE_URL = "https://default37cd273a1cec4aaea29741480ea54f.8d.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/cfb8e9cda6254d18a1a584334dab906e/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=EI5tdN3WXlm6v26bZWN8c8-AD1qgDgCWkSkV0gDRUUE";
+
     const SECRET_PASS = "AMNSCNF0208";
-    
+
     let activePermits = {};
     let currentPermitKey = "";
     let pendingPermitKey = "";
@@ -347,8 +353,7 @@
         try {
             const res = await fetch(GOOGLE_SCRIPT_URL, {
                 method: "GET",
-                mode: "cors",
-                redirect: "follow"
+                mode: "cors"
             });
             if (res.ok) {
                 const remotePermitsArray = await res.json();
@@ -370,7 +375,7 @@
     function openPermitsModal() {
         const container = document.getElementById("modalPermitContainer");
         const openKeys = Object.keys(activePermits).filter(key => String(activePermits[key].Status).toUpperCase() === "ACTIVE");
-        
+
         if (openKeys.length === 0) {
             container.innerHTML = "<p style='font-size:13px; color:#666;'>No open confined space permits found in the plant.</p>";
         } else {
@@ -427,7 +432,7 @@
     function processPermitLookup() {
         const permitNo = document.getElementById("lookupPermitNo").value.trim().toUpperCase();
         if (!permitNo) { alert("Please enter a Work Permit Number."); return; }
-        
+
         if (activePermits[permitNo]) {
             requestPermitAccess(permitNo);
         } else {
@@ -481,6 +486,7 @@
     }
 
     async function sendDataToBackends(payload) {
+        // Send to Google Apps Script as URL-encoded parameter format with no-cors mode to prevent redirection handling failures
         const formBody = [];
         for (const property in payload) {
             const encodedKey = encodeURIComponent(property);
@@ -491,10 +497,12 @@
 
         const googleScriptPromise = fetch(GOOGLE_SCRIPT_URL, {
             method: "POST",
+            mode: "no-cors",
             headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
             body: encodedString
         }).catch(err => console.error("Google Apps Script Error:", err));
 
+        // Send to Power Automate as JSON payload
         const powerAutomatePromise = fetch(POWER_AUTOMATE_URL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -508,17 +516,26 @@
         e.preventDefault();
 
         const pin = document.getElementById("createPin").value;
-        if (pin.length !== 4) { alert("PIN must be exactly 4 digits."); return; }
+        if (!/^\d{4}$/.test(pin)) { alert("PIN must be exactly 4 digits."); return; }
+
+        const entrantInputs = document.querySelectorAll(".entrant-input");
+        const entrantsList = [];
+        let validEntrants = true;
+
+        entrantInputs.forEach((input, index) => {
+            const val = input.value.trim();
+            if (!val) validEntrants = false;
+            else entrantsList.push(`${index + 1}. ${val}`);
+        });
+
+        if (!validEntrants || entrantsList.length === 0) {
+            alert("Please fill out all entrant details.");
+            return;
+        }
 
         const submitBtn = document.getElementById("submitBtn");
         submitBtn.disabled = true; 
         submitBtn.innerText = "Submitting Entry...";
-
-        const entrantInputs = document.querySelectorAll(".entrant-input");
-        const entrantsList = [];
-        entrantInputs.forEach((input, index) => {
-            if (input.value.trim() !== "") entrantsList.push(`${index + 1}. ${input.value.trim()}`);
-        });
 
         const currentTimestamp = new Date().toLocaleString();
 
