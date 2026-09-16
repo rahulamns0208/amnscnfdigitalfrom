@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AM/NS India - Secure Multi-Permit Confined Space Portal</title>
+    <title>AM/NS India - Confined Space & Gas Hazard Portal</title>
     <style>
         :root {
             --primary-color: #c8102e;
@@ -73,16 +73,42 @@
         .btn-complete { background-color: var(--success-color); }
         .btn-secondary { background-color: #6c757d; margin-top: 6px; }
 
-        .status-message { margin-top: 12px; padding: 10px; border-radius: 6px; display: none; text-align: center; font-size: 13px; font-weight: bold; }
+        .active-tap-banner {
+            background-color: #e3f2fd;
+            border: 2px dashed #0d47a1;
+            border-radius: 8px;
+            padding: 14px;
+            text-align: center;
+            cursor: pointer;
+            margin-bottom: 18px;
+            transition: background-color 0.2s ease;
+        }
+
+        .active-tap-banner:hover { background-color: #bbdefb; }
+        .active-tap-banner h3 { margin: 0 0 4px 0; color: #0d47a1; font-size: 16px; }
+        .active-tap-banner p { margin: 0; font-size: 12px; color: #1565c0; }
 
         .wip-badge { background-color: #fff3cd; color: #856404; padding: 10px; border-radius: 6px; text-align: center; font-weight: bold; margin-bottom: 16px; }
         .summary-card { background: #f8f9fa; border: 1px solid var(--border-color); border-radius: 6px; padding: 12px; margin-bottom: 16px; font-size: 13px; }
 
-        #pinModal {
+        .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 10000;
+            padding: 12px;
         }
-        .pin-card { background: #fff; padding: 20px; border-radius: 8px; text-align: center; width: 90%; max-width: 350px; }
+        .modal-card { background: #fff; padding: 20px; border-radius: 8px; width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto; }
+
+        .permit-item-card {
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--primary-color);
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fafafa;
+        }
 
         @media (min-width: 600px) {
             body { padding: 20px; }
@@ -104,10 +130,23 @@
     </div>
 </div>
 
-<div id="pinModal">
-    <div class="pin-card">
-        <h4 style="margin-top:0; color: var(--primary-color);">🔐 Permit Security Verification</h4>
-        <p style="font-size: 12px; color: #555;">Enter the 4-digit Security PIN created during permit initiation:</p>
+<!-- ALL OPEN PERMITS TAP MODAL -->
+<div id="permitsListModal" class="modal-overlay">
+    <div class="modal-card">
+        <h3 style="margin-top:0; color: var(--primary-color); border-bottom: 2px solid var(--primary-color); padding-bottom: 8px;">
+            🔓 Active Confined Space Permits in Plant
+        </h3>
+        <p style="font-size: 12px; color: #555;">Select any permit to enter security PIN and open details:</p>
+        <div id="modalPermitContainer">Loading active plant permits...</div>
+        <button type="button" class="btn-submit btn-secondary" onclick="closePermitsModal()">Close Window</button>
+    </div>
+</div>
+
+<!-- PIN VERIFICATION MODAL -->
+<div id="pinModal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 360px; text-align: center;">
+        <h4 style="margin-top:0; color: var(--primary-color);">🔒 Enter Security PIN</h4>
+        <p style="font-size: 12px; color: #555;">Enter 4-digit PIN for Permit: <strong id="targetPermitDisplay"></strong></p>
         <input type="password" id="verifyPinInput" maxlength="4" placeholder="4-Digit PIN" style="text-align: center; font-size: 18px; margin-bottom: 10px;">
         <button type="button" class="btn-submit" onclick="confirmPermitPin()">Authorize & Access</button>
         <button type="button" class="btn-submit btn-secondary" onclick="closePinModal()">Cancel</button>
@@ -120,18 +159,19 @@
         <h2>Confined Space & Gas Hazard Area Entry Portal</h2>
     </div>
 
+    <!-- TAPPABLE LINK BANNER -->
+    <div class="active-tap-banner" onclick="openPermitsModal()">
+        <h3>🚨 CLICK HERE TO VIEW ACTIVE CONFINED SPACE PERMITS 🚨</h3>
+        <p>Tap to view all ongoing plant work permits across departments</p>
+    </div>
+
     <!-- LOOKUP VIEW -->
     <div id="permitLookupView">
         <div class="form-group">
-            <label for="lookupPermitNo">Enter Work Permit No. to Access or Create Permit *</label>
+            <label for="lookupPermitNo">Enter Work Permit No. to Access or Initiate Permit *</label>
             <input type="text" id="lookupPermitNo" placeholder="E.g., WP-2026-001" autofocus>
         </div>
         <button type="button" class="btn-submit" onclick="processPermitLookup()">Proceed with Permit</button>
-        
-        <div style="margin-top: 20px;">
-            <label style="color: var(--primary-color); font-size: 14px;">Active Confined Space Work Permits:</label>
-            <div id="activePermitsList" style="margin-top: 8px;"></div>
-        </div>
     </div>
 
     <!-- NEW ENTRY VIEW -->
@@ -174,10 +214,6 @@
                             <option value="UTILITY_ELEC">UTILITY - Electrical</option>
                             <option value="UTILITY_PROD">UTILITY - Production</option>
                         </optgroup>
-                        <optgroup label="GENERAL / MANAGEMENT">
-                            <option value="ADMIN">ADMIN</option>
-                            <option value="LOGISTICS">LOGISTICS</option>
-                        </optgroup>
                     </select>
                 </div>
             </div>
@@ -197,8 +233,7 @@
 
             <div class="form-group" style="background: #e9ecef; padding: 12px; border-radius: 6px;">
                 <label for="createPin" style="color: var(--primary-color);">Set 4-Digit Security PIN for this Permit *</label>
-                <input type="password" id="createPin" maxlength="4" required placeholder="Set 4-digit PIN (e.g. 1234)" style="text-align: center; font-weight: bold;">
-                <span style="font-size: 11px; color: #666;">This PIN will be required to access or close this specific permit later.</span>
+                <input type="password" id="createPin" maxlength="4" required placeholder="Set 4-digit PIN" style="text-align: center; font-weight: bold;">
             </div>
 
             <div class="form-group">
@@ -270,6 +305,11 @@
                 <input type="number" id="exitedHeadcount" required placeholder="Confirm exited headcount" readonly>
             </div>
 
+            <div class="form-group" style="background: #e9ecef; padding: 12px; border-radius: 6px;">
+                <label for="exitPin" style="color: var(--primary-color);">Enter 4-Digit Security PIN to Authorize Exit *</label>
+                <input type="password" id="exitPin" maxlength="4" required placeholder="Enter 4-digit PIN" style="text-align: center; font-weight: bold;">
+            </div>
+
             <div class="form-group">
                 <label for="exitRemarks">Completion Remarks *</label>
                 <textarea id="exitRemarks" rows="2" required placeholder="E.g., Work completed, space cleared..."></textarea>
@@ -279,13 +319,12 @@
             <button type="button" class="btn-submit btn-secondary" onclick="resetToLookup()">Switch / Check Another Permit</button>
         </form>
     </div>
-
-    <div id="statusMessage" class="status-message"></div>
 </div>
 
 <script>
-    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxCC5MXaOoOHpfP73-dxuGwnlib99pd9ASNWdnQ801sQOhvZHbwPmw-u6a6MO3gGCdNRw/exec";
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzmoGhU9kQUYlf8nZCnlJAl_PC-gp8lARpkXjBhdSyA4dra3yiZO6K2TfNOHLGIXTWC/exec";
     const POWER_AUTOMATE_URL = "https://default37cd273a1cec4aaea29741480ea54f.8d.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/62e0ced429bc4b2aa03c672bf333334b/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=hj17r1Zp5o87SzxxGK_CULg0KQFwE8MSEzOiGxYcvJo";
+    
     const SECRET_PASS = "AMNSCNF0208";
     
     let activePermits = {};
@@ -296,68 +335,72 @@
         if (document.getElementById("accessPassword").value === SECRET_PASS) {
             document.getElementById("authOverlay").style.display = "none";
             document.getElementById("mainContent").style.display = "block";
-            
-            const savedPermit = localStorage.getItem("AMNS_CURRENT_PERMIT");
-            if (savedPermit) {
-                const permitData = JSON.parse(savedPermit);
-                currentPermitKey = permitData.WorkPermitNo;
-                document.getElementById("permitLookupView").style.display = "none";
-                renderWIPScreen(permitData);
-            } else {
-                fetchActivePermitsFromBackend();
-            }
-
-            setInterval(fetchActivePermitsFromBackend, 15000);
+            resetToLookup();
+            fetchActivePermitsFromGoogle();
+            setInterval(fetchActivePermitsFromGoogle, 15000);
         } else {
             document.getElementById("authError").style.display = "block";
         }
     }
 
-    async function fetchActivePermitsFromBackend() {
+    async function fetchActivePermitsFromGoogle() {
         try {
-            const res = await fetch(GOOGLE_SCRIPT_URL);
+            const res = await fetch(GOOGLE_SCRIPT_URL, {
+                method: "GET",
+                mode: "cors",
+                redirect: "follow"
+            });
             if (res.ok) {
-                const remotePermits = await res.json();
-                activePermits = Object.assign({}, activePermits, remotePermits);
-                renderActivePermitsList();
+                const remotePermitsArray = await res.json();
+                const newPermitMap = {};
+                if (Array.isArray(remotePermitsArray)) {
+                    remotePermitsArray.forEach(item => {
+                        if (item.WorkPermitNo && String(item.Status).toUpperCase() === "ACTIVE") {
+                            newPermitMap[item.WorkPermitNo] = item;
+                        }
+                    });
+                }
+                activePermits = newPermitMap;
             }
         } catch (err) {
             console.error("Error fetching active permits:", err);
         }
     }
 
-    function renderActivePermitsList() {
-        const container = document.getElementById("activePermitsList");
-        const keys = Object.keys(activePermits);
-        if (keys.length === 0) {
-            container.innerHTML = "<p style='font-size:12px; color:#666;'>No active confined space work permits found.</p>";
-            return;
+    function openPermitsModal() {
+        const container = document.getElementById("modalPermitContainer");
+        const openKeys = Object.keys(activePermits).filter(key => String(activePermits[key].Status).toUpperCase() === "ACTIVE");
+        
+        if (openKeys.length === 0) {
+            container.innerHTML = "<p style='font-size:13px; color:#666;'>No open confined space permits found in the plant.</p>";
+        } else {
+            let html = "";
+            openKeys.forEach(key => {
+                const permit = activePermits[key];
+                html += `
+                    <div class="permit-item-card">
+                        <div>
+                            <strong style="color: var(--primary-color);">${key}</strong><br>
+                            <span style="font-size: 11px; color: #555;">Dept: ${permit.Department || 'N/A'} | Entrants: ${permit.NoOfEntrants || 0}</span>
+                        </div>
+                        <button type="button" onclick="requestPermitAccess('${key}')" style="padding: 6px 12px; background: var(--primary-color); color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer;">
+                            Open
+                        </button>
+                    </div>`;
+            });
+            container.innerHTML = html;
         }
-
-        let html = "<ul style='padding-left: 20px; font-size: 13px;'>";
-        keys.forEach(key => {
-            html += `<li style='margin-bottom: 6px;'>
-                        <strong>${key}</strong> - ${activePermits[key].Department} 🔒
-                        <button type='button' onclick="requestPermitAccess('${key}')" style='margin-left:8px; padding:2px 8px; font-size:11px; cursor:pointer;'>Access WIP</button>
-                     </li>`;
-        });
-        html += "</ul>";
-        container.innerHTML = html;
+        document.getElementById("permitsListModal").style.display = "flex";
     }
 
-    function processPermitLookup() {
-        const permitNo = document.getElementById("lookupPermitNo").value.trim().toUpperCase();
-        if (!permitNo) { alert("Please enter a Work Permit Number."); return; }
-        
-        if (activePermits[permitNo]) {
-            requestPermitAccess(permitNo);
-        } else {
-            openNewPermitForm(permitNo);
-        }
+    function closePermitsModal() {
+        document.getElementById("permitsListModal").style.display = "none";
     }
 
     function requestPermitAccess(permitNo) {
+        closePermitsModal();
         pendingPermitKey = permitNo;
+        document.getElementById("targetPermitDisplay").innerText = permitNo;
         document.getElementById("verifyPinInput").value = "";
         document.getElementById("pinModal").style.display = "flex";
     }
@@ -377,7 +420,18 @@
             document.getElementById("permitLookupView").style.display = "none";
             renderWIPScreen(targetPermit);
         } else {
-            alert("Incorrect Security PIN for this permit!");
+            alert("Incorrect Security PIN for permit " + pendingPermitKey);
+        }
+    }
+
+    function processPermitLookup() {
+        const permitNo = document.getElementById("lookupPermitNo").value.trim().toUpperCase();
+        if (!permitNo) { alert("Please enter a Work Permit Number."); return; }
+        
+        if (activePermits[permitNo]) {
+            requestPermitAccess(permitNo);
+        } else {
+            openNewPermitForm(permitNo);
         }
     }
 
@@ -391,12 +445,12 @@
     }
 
     function resetToLookup() {
-        localStorage.removeItem("AMNS_CURRENT_PERMIT");
+        currentPermitKey = "";
+        pendingPermitKey = "";
         document.getElementById("permitLookupView").style.display = "block";
         document.getElementById("entryFormView").style.display = "none";
         document.getElementById("wipView").style.display = "none";
         document.getElementById("lookupPermitNo").value = "";
-        fetchActivePermitsFromBackend();
     }
 
     function generateCertNumbers() {
@@ -426,24 +480,28 @@
         }
     }
 
-    // DISPATCH FUNCTION TO CALL BOTH BACKENDS
     async function sendDataToBackends(payload) {
-        // 1. Post to Power Automate Endpoint directly
+        const formBody = [];
+        for (const property in payload) {
+            const encodedKey = encodeURIComponent(property);
+            const encodedValue = encodeURIComponent(payload[property]);
+            formBody.push(encodedKey + "=" + encodedValue);
+        }
+        const encodedString = formBody.join("&");
+
+        const googleScriptPromise = fetch(GOOGLE_SCRIPT_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+            body: encodedString
+        }).catch(err => console.error("Google Apps Script Error:", err));
+
         const powerAutomatePromise = fetch(POWER_AUTOMATE_URL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
         }).catch(err => console.error("Power Automate Error:", err));
 
-        // 2. Post to Google Apps Script Sheet Logger
-        const googleScriptPromise = fetch(GOOGLE_SCRIPT_URL, {
-            method: "POST",
-            mode: "no-cors",
-            headers: { "Content-Type": "text/plain" },
-            body: JSON.stringify(payload)
-        }).catch(err => console.error("Google Script Error:", err));
-
-        await Promise.allSettled([powerAutomatePromise, googleScriptPromise]);
+        await Promise.allSettled([googleScriptPromise, powerAutomatePromise]);
     }
 
     document.getElementById("confinedEntryForm").addEventListener("submit", async function(e) {
@@ -462,6 +520,8 @@
             if (input.value.trim() !== "") entrantsList.push(`${index + 1}. ${input.value.trim()}`);
         });
 
+        const currentTimestamp = new Date().toLocaleString();
+
         const payload = {
             Action: "ENTRY",
             WorkPermitNo: currentPermitKey,
@@ -476,18 +536,16 @@
             SupervisorName: document.getElementById("supervisorName").value,
             RescuePersonName: document.getElementById("rescuePersonName").value,
             Status: "ACTIVE",
-            Timestamp: new Date().toLocaleString()
+            Timestamp: currentTimestamp,
+            EntryTimestamp: currentTimestamp
         };
 
-        // Cache locally for immediate visual transition
         activePermits[currentPermitKey] = payload;
-        
-        document.getElementById("confinedEntryForm").reset();
         renderWIPScreen(payload);
 
-        // Send payload to Power Automate and Google Apps Script simultaneously
         await sendDataToBackends(payload);
 
+        document.getElementById("confinedEntryForm").reset();
         submitBtn.disabled = false; 
         submitBtn.innerText = "Enter in Confined Space";
     });
@@ -495,8 +553,6 @@
     function renderWIPScreen(data) {
         document.getElementById("entryFormView").style.display = "none";
         document.getElementById("wipView").style.display = "block";
-
-        localStorage.setItem("AMNS_CURRENT_PERMIT", JSON.stringify(data));
 
         document.getElementById("wipPermitNo").innerText = data.WorkPermitNo;
         document.getElementById("wipCertNo").innerText = data.ConfinedSpaceCertNo;
@@ -517,6 +573,7 @@
             }
         });
         document.getElementById("exitedHeadcount").value = 0;
+        document.getElementById("exitPin").value = "";
     }
 
     function updateExitCount() {
@@ -525,38 +582,50 @@
 
     document.getElementById("exitForm").addEventListener("submit", async function(e) {
         e.preventDefault();
-        const activeData = activePermits[currentPermitKey];
+        const activeData = activePermits[currentPermitKey] || {};
         const verifiedCount = parseInt(document.getElementById("exitedHeadcount").value, 10);
-        const totalExpected = parseInt(activeData.NoOfEntrants, 10);
+        const totalExpected = parseInt(activeData.NoOfEntrants || 0, 10);
+        const enteredPin = document.getElementById("exitPin").value;
 
         if (verifiedCount !== totalExpected) {
             alert(`Headcount mismatch! All ${totalExpected} entrants must be verified safe before closing permit.`);
             return;
         }
 
+        if (String(enteredPin) !== String(activeData.Pin)) {
+            alert("Incorrect Security PIN! You must enter the 4-digit PIN assigned during entry.");
+            return;
+        }
+
         const exitSubmitBtn = document.getElementById("exitSubmitBtn");
-        exitSubmitBtn.disabled = true; exitSubmitBtn.innerText = "Submitting Exit Log...";
+        exitSubmitBtn.disabled = true; 
+        exitSubmitBtn.innerText = "Submitting Exit Log...";
+
+        const exitTime = new Date().toLocaleString();
 
         const exitPayload = {
             Action: "EXIT",
-            WorkPermitNo: activeData.WorkPermitNo,
-            ConfinedSpaceCertNo: activeData.ConfinedSpaceCertNo,
-            Department: activeData.Department,
-            AreaCategory: activeData.AreaCategory,
-            EntrantsList: activeData.EntrantsList,
-            AttendantName: activeData.AttendantName,
-            SupervisorName: activeData.SupervisorName,
-            RescuePersonName: activeData.RescuePersonName,
-            EntryTimestamp: activeData.Timestamp || activeData.EntryTimestamp,
-            ExitTimestamp: new Date().toLocaleString(),
+            WorkPermitNo: activeData.WorkPermitNo || currentPermitKey,
+            Pin: activeData.Pin || "",
+            ConfinedSpaceCertNo: activeData.ConfinedSpaceCertNo || "",
+            Department: activeData.Department || "",
+            AreaCategory: activeData.AreaCategory || "",
+            WorkDescription: activeData.WorkDescription || "",
+            NoOfEntrants: activeData.NoOfEntrants || verifiedCount,
+            EntrantsList: activeData.EntrantsList || "",
+            AttendantName: activeData.AttendantName || "",
+            SupervisorName: activeData.SupervisorName || "",
+            RescuePersonName: activeData.RescuePersonName || "",
+            Timestamp: exitTime,
+            EntryTimestamp: activeData.Timestamp || activeData.EntryTimestamp || "",
+            ExitTimestamp: exitTime,
             ExitedHeadcount: verifiedCount,
-            ExitRemarks: document.getElementById("exitRemarks").value
+            ExitRemarks: document.getElementById("exitRemarks").value,
+            Status: "CLOSED"
         };
 
         delete activePermits[currentPermitKey];
-        localStorage.removeItem("AMNS_CURRENT_PERMIT");
 
-        // Send exit payload to Power Automate and Google Apps Script simultaneously
         await sendDataToBackends(exitPayload);
 
         alert(`Permit ${currentPermitKey} successfully verified and closed!`);
