@@ -329,7 +329,6 @@
 
 <script>
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzmoGhU9kQUYlf8nZCnlJAl_PC-gp8lARpkXjBhdSyA4dra3yiZO6K2TfNOHLGIXTWC/exec";
-    const POWER_AUTOMATE_URL = "https://default37cd273a1cec4aaea29741480ea54f.8d.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/cfb8e9cda6254d18a1a584334dab906e/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=EI5tdN3WXlm6v26bZWN8c8-AD1qgDgCWkSkV0gDRUUE";
 
     const SECRET_PASS = "AMNSCNF0208";
 
@@ -502,14 +501,9 @@
             body: encodedString
         }).catch(err => console.error("Google Apps Script Error:", err));
 
-        // Send to Power Automate as JSON payload
-        const powerAutomatePromise = fetch(POWER_AUTOMATE_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-        }).catch(err => console.error("Power Automate Error:", err));
-
-        await Promise.allSettled([googleScriptPromise, powerAutomatePromise]);
+        // Power Automate is called SERVER-SIDE by Google Apps Script.
+        // Do not call Power Automate directly from the browser.
+        await googleScriptPromise;
     }
 
     document.getElementById("confinedEntryForm").addEventListener("submit", async function(e) {
@@ -641,9 +635,9 @@
             Status: "CLOSED"
         };
 
-        delete activePermits[currentPermitKey];
-
         await sendDataToBackends(exitPayload);
+
+        delete activePermits[currentPermitKey];
 
         alert(`Permit ${currentPermitKey} successfully verified and closed!`);
         resetToLookup();
